@@ -2,10 +2,7 @@ package by.may.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -36,8 +33,6 @@ public class Product {
     @Positive
     private BigDecimal price;
 
-    private double averageRating;
-
     @Setter
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
@@ -49,21 +44,16 @@ public class Product {
     @Column(nullable = false)
     private boolean isDeleted = false;
 
-    public Product(String name, String description, BigDecimal price, double averageRating, Category category, LocalDate createdAt) {
+    public Product(String name, String description, BigDecimal price, Category category) {
         this.name = name;
         this.description = description;
         this.price = price;
-        this.averageRating = averageRating;
         this.category = category;
     }
 
     @PrePersist
     private void onCreate() {
         this.createdAt = LocalDate.now();
-    }
-
-    public void updateAverageRating(double averageRating) {
-        this.averageRating = averageRating;
     }
 
 }
