@@ -13,6 +13,7 @@ import java.time.LocalDate;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@SQLRestriction("is_deleted = false")
 @Entity
 @SQLRestriction("is_deleted = false")
 @Table(name = "reviews", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "product_id"}))
