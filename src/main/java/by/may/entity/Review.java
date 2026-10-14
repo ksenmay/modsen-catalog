@@ -13,6 +13,7 @@ import java.time.LocalDate;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@SQLRestriction("is_deleted = false")
 @Entity
 @Table(name = "reviews", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "product_id"}))
 public class Review {
@@ -41,6 +42,9 @@ public class Review {
     @JoinColumn(name="product_id", nullable = false)
     private Product product;
 
+    @Setter
+    private boolean isDeleted = false;
+
     @Column(nullable = false, updatable = false)
     private LocalDate createdAt;
 
@@ -54,5 +58,9 @@ public class Review {
     @PrePersist
     private void onCreate() {
         this.createdAt = LocalDate.now();
+    }
+
+    public void markDelete() {
+        this.isDeleted = true;
     }
 }

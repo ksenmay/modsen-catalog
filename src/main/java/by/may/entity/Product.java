@@ -49,21 +49,16 @@ public class Product {
     @Column(nullable = false)
     private boolean isDeleted = false;
 
-    public Product(String name, String description, BigDecimal price, double averageRating, Category category, LocalDate createdAt) {
+    public Product(String name, String description, BigDecimal price, Category category, LocalDate createdAt) {
         this.name = name;
         this.description = description;
         this.price = price;
-        this.averageRating = averageRating;
         this.category = category;
     }
 
     @PrePersist
     private void onCreate() {
         this.createdAt = LocalDate.now();
-    }
-
-    public void updateAverageRating(double averageRating) {
-        this.averageRating = averageRating;
     }
 
 }

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.awt.print.Pageable;
 import java.util.List;
+import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByName(String name);
@@ -16,4 +17,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     List<Product> findAllByPriceBetween(double min, double max);
     Page<Product> findAllByPriceBetween(double min, double max, Pageable pageable);
+
+    Optional<Product> getProductById(Long id);
+
 }
