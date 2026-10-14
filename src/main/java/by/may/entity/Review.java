@@ -15,7 +15,6 @@ import java.time.LocalDate;
 @Getter
 @SQLRestriction("is_deleted = false")
 @Entity
-@SQLRestriction("is_deleted = false")
 @Table(name = "reviews", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "product_id"}))
 public class Review {
 
