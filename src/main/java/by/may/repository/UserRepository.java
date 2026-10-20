@@ -10,14 +10,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-
-    Optional<User> findByUsername(String username);
-    Optional<User> findByEmail(String email);
+    boolean existsByUsernameAndIdNot(String username, Long id);
+    boolean existsByEmailAndIdNot(String email, Long id);
 
     boolean existsByUsername(String username);
-    boolean existsByEmail(String email);
 
-    Page<User> findAll(Pageable pageable);
-    List<User> findAllByRole(Role role);
-
+    long countByRole(Role role);
 }
