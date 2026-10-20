@@ -41,8 +41,11 @@ public class Product {
     @Column(nullable = false, updatable = false)
     private LocalDate createdAt;
 
-    @Column(nullable = false)
-    private boolean isDeleted = false;
+    @Column(name = "is_delete", nullable = false)
+    private boolean deleted = false;
+
+    @Setter
+    private double averageRating = 0;
 
     public Product(String name, String description, BigDecimal price, Category category) {
         this.name = name;

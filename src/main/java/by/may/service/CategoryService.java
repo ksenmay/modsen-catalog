@@ -2,10 +2,10 @@ package by.may.service;
 
 import by.may.dto.CategoryCreateRequest;
 import by.may.dto.CategoryResponse;
-import by.may.dto.mapper.CategoryMapper;
+import by.may.mapper.CategoryMapper;
 import by.may.entity.Category;
 import by.may.exception.CategoryAlreadyExistsException;
-import by.may.exception.CategoryNotFound;
+import by.may.exception.CategoryNotFoundException;
 import by.may.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -21,7 +21,8 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
 
-    CategoryResponse createCategory(CategoryCreateRequest dto) {
+    @Transactional
+    public CategoryResponse createCategory(CategoryCreateRequest dto) {
         if (categoryRepository.existsByName(dto.name())) {
             throw new CategoryAlreadyExistsException(dto.name());
         }
@@ -30,9 +31,9 @@ public class CategoryService {
     }
 
     @Transactional
-    CategoryResponse updateCategory(Long id, CategoryCreateRequest dto) {
+    public CategoryResponse updateCategory(Long id, CategoryCreateRequest dto) {
         Category category = categoryRepository.findById(id).orElseThrow(
-                () -> new CategoryNotFound(id)
+                () -> new CategoryNotFoundException(id)
         );
 
         if (!category.getName().equals(dto.name()) && categoryRepository.existsByName(dto.name())) {
@@ -44,9 +45,10 @@ public class CategoryService {
         return categoryMapper.toDto(category);
     }
 
-    void deleteCategory(Long id) {
+    @Transactional
+    public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id).orElseThrow(
-                () -> new CategoryNotFound(id)
+                () -> new CategoryNotFoundException(id)
         );
 
         //TODO написать проверку для продуктов, которые лежат в категории
@@ -55,7 +57,7 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
-    List<CategoryResponse> getAllCategories() {
+    public List<CategoryResponse> getAllCategories() {
         return categoryRepository.findAll(Sort.by("name")).stream()
                 .map(categoryMapper::toDto)
                 .toList();
