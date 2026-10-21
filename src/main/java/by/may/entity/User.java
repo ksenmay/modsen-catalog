@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Getter
 @Entity
 @Table(name = "users")
-@SQLDelete(sql = "UPDATE user SET is_deleted = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE users SET is_deleted = true WHERE id = ?")
 @SQLRestriction("is_deleted = false")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
@@ -38,13 +38,14 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Setter
     private Role role;
 
     @Column(nullable = false, updatable = false)
     private LocalDate createdAt;
 
-    @Column(nullable = false)
-    private boolean isDeleted = false;
+    @Column(name = "is_deleted", nullable = false)
+    private boolean deleted = false;
 
     public User(String username, String email, String passwordHash, Role role) {
         this.username = username;

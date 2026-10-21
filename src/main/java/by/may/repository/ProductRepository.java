@@ -1,18 +1,12 @@
 package by.may.repository;
 
 import by.may.entity.Product;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import java.util.List;
 import java.util.Optional;
 
-public interface ProductRepository extends JpaRepository<Product, Long> { //TODO добавить сортировку
-    Page<Product> findByNameContainingIgnoreCase(Pageable name);
-    List<Product> findByNameContainingIgnoreCase(String name);
-
+public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
     boolean existsByCategoryId(Long categoryId);
-
-    Optional<Product> getProductById(Long id);
+    Optional<Product> findById(Long id);
 }

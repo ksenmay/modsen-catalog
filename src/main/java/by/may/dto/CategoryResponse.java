@@ -1,4 +1,6 @@
 package by.may.dto;
 
-public record CategoryResponse(String name, String description) {
-}
+public record CategoryResponse(
+        Long id,
+        String name,
+        String description) {}
