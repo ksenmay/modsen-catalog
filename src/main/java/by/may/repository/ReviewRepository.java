@@ -13,7 +13,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     boolean existsByUserIdAndProductId(Long userId, Long productId);
-    Page<Review> findAllByProductId(Long productId, Pageable pageable);
     List<Review> findAllByProductId(Long productId);
 
     @Query("select coalesce(avg(r.rating), 0.0) from Review r where r.product.id = :productId")

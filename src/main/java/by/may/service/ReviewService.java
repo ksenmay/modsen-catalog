@@ -2,6 +2,7 @@ package by.may.service;
 
 import by.may.dto.ReviewCreateRequest;
 import by.may.dto.ReviewResponse;
+import by.may.entity.Role;
 import by.may.mapper.ReviewMapper;
 import by.may.entity.Product;
 import by.may.entity.Review;
@@ -43,7 +44,7 @@ public class ReviewService {
 
         Review review = reviewMapper.toEntity(dto, user, product);
         reviewRepository.save(review);
-        refreshAverageRating(productId);
+        product.setAverageRating(reviewRepository.calculateAverageRating(productId));
 
         return reviewMapper.toDto(review);
     }
@@ -63,25 +64,21 @@ public class ReviewService {
 
         Product product = review.getProduct();
 
-        refreshAverageRating(product.getId());
+        product.setAverageRating(reviewRepository.calculateAverageRating(product.getId()));
         return reviewMapper.toDto(review);
     }
 
-    public double calculateAverageRating(Long productId) {
-        List<Review> reviews = reviewRepository.findAllByProductId(productId);
-        return reviews.stream().mapToDouble(Review::getRating).average().orElse(0.0);
+    @Transactional
+    public void deleteReview(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(
+                () -> new ReviewNotFoundException(reviewId)
+        );
+
+        User currentUser = null; //TODO исправить проверку на текущего пользователя
+        if (review.getUser() == currentUser || review.getUser().getRole() != Role.ADMIN) {
+            throw new ReviewNotWrittenByCurrentUserException(reviewId, currentUser.getId());
+        }
+
+        reviewRepository.delete(review);
     }
-
-//    public void deleteReview(Long reviewId) {
-//
-//    }
-//
-//    private Review findOwnReview() {
-//
-//    }
-
-    private double refreshAverageRating(Long productId) {
-        return 0.0;
-    }
-
 }
