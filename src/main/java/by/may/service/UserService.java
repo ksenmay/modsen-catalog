@@ -5,9 +5,11 @@ import by.may.dto.UserResponse;
 import by.may.dto.UserUpdateRequest;
 import by.may.entity.Role;
 import by.may.entity.User;
+import by.may.event.UserRoleChangedEvent;
 import by.may.exception.AdminMinLimitException;
 import by.may.exception.UserAlreadyExistsException;
 import by.may.exception.UserNotFoundException;
+import by.may.listener.UserRoleChangedHandler;
 import by.may.mapper.UserMapper;
 import by.may.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final UserRoleChangedHandler userRoleChangedHandler;
 
     @Transactional
     public UserResponse createUser(UserCreateRequest dto) {
@@ -68,7 +71,7 @@ public class UserService {
         Role oldRole = user.getRole();
         user.setRole(newRole);
 
-        //TODO событие смены роли добавить
+        userRoleChangedHandler.handle(new UserRoleChangedEvent(user.getUsername(), oldRole, newRole));
 
         return userMapper.toDto(user);
     }
