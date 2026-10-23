@@ -1,4 +1,4 @@
-package auth;
+package by.may.auth;
 
 import by.may.entity.Role;
 import by.may.entity.User;
