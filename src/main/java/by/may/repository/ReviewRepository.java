@@ -3,10 +3,7 @@ package by.may.repository;
 import by.may.entity.Review;
 
 import java.util.List;
-import java.util.Optional;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,5 +16,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     double calculateAverageRating(@Param("productId") Long productId);
 
     @Query("update Review r set r.deleted = true where r.product.id =: productId")
-    int softDeleteByProductId(@Param("productId") Long productId);
+    void softDeleteByProductId(@Param("productId") Long productId);
 }

@@ -1,7 +1,5 @@
 package by.may.dto;
 
-import by.may.entity.Category;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
