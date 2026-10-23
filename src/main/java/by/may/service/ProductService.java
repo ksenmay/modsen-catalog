@@ -3,16 +3,16 @@ package by.may.service;
 import by.may.dto.ProductCreateRequest;
 import by.may.dto.ProductResponse;
 import by.may.entity.Category;
+import by.may.entity.PriceHistory;
+import by.may.event.PriceChangedEvent;
+import by.may.event.ProductDeletedEvent;
 import by.may.exception.CategoryNotFoundException;
 import by.may.mapper.ProductMapper;
 import by.may.entity.Product;
-import by.may.entity.Review;
 import by.may.exception.ProductNotFoundException;
-import by.may.repository.CategoryRepository;
-import by.may.repository.ProductRepository;
-import by.may.repository.ProductSpecifications;
-import by.may.repository.ReviewRepository;
+import by.may.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,17 +21,21 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+
 @Service
 @RequiredArgsConstructor
-public class ProductService { //TODO добавить events
+public class ProductService {
 
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
     private final ReviewRepository reviewRepository;
     private final CategoryRepository categoryRepository;
+    private final ApplicationEventPublisher eventPublisher;
+    private final PriceHistoryRepository priceHistoryRepository;
 
     @Transactional
-    public ProductResponse createProduct(ProductCreateRequest dto) { //TODO пересмотреть как будет взаимодействовать с категориями
+    public ProductResponse createProduct(ProductCreateRequest dto) {
         Category category = categoryRepository.findById(dto.categoryId()).orElseThrow(
                 () -> new CategoryNotFoundException(dto.categoryId())
         );
@@ -41,7 +45,7 @@ public class ProductService { //TODO добавить events
     }
 
     @Transactional
-    public ProductResponse updateProduct(Long id, ProductCreateRequest dto) { //TODO после добавления сущности PriceHistory обновить метод
+    public ProductResponse updateProduct(Long id, ProductCreateRequest dto) {
         Product product = productRepository.findById(id).orElseThrow(
                 () -> new ProductNotFoundException(id)
         );
@@ -53,7 +57,16 @@ public class ProductService { //TODO добавить events
         product.setName(dto.name());
         product.setCategory(category);
         product.setDescription(dto.description());
-        product.setPrice(dto.price());
+
+        BigDecimal oldPrice = product.getPrice();
+        BigDecimal newPrice = dto.price();
+        boolean priceChanged = newPrice.compareTo(oldPrice) != 0;
+        product.setPrice(newPrice);
+
+        if (priceChanged) {
+            priceHistoryRepository.save(new PriceHistory(product, oldPrice, newPrice));
+            eventPublisher.publishEvent(new PriceChangedEvent(product.getName(), oldPrice, newPrice));
+        }
 
         return productMapper.toDto(product);
     }
@@ -64,8 +77,10 @@ public class ProductService { //TODO добавить events
                 () -> new ProductNotFoundException(id)
         );
 
-        reviewRepository.findAllByProductId(id).forEach(Review::markDelete);
+        String productName = product.getName();
+        reviewRepository.softDeleteByProductId(id);
         productRepository.delete(product);
+        eventPublisher.publishEvent(new ProductDeletedEvent(productName));
     }
 
     @Transactional(readOnly = true)

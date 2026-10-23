@@ -1,13 +1,13 @@
 package by.may.listener;
 
-import by.may.event.PriceChangeEvent;
+import by.may.event.PriceChangedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PriceChangeHandler {
+public class PriceChangedHandler {
     @EventListener
-    public void handle (PriceChangeEvent event) {
+    public void handle (PriceChangedEvent event) {
         System.out.print("Цена продукта " + event.productName() +
                 " изменилась с " + event.oldPrice() +
                 " на " + event.newPrice());

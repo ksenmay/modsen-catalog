@@ -1,9 +1,11 @@
 package by.may.auth;
 
 import by.may.entity.User;
+import by.may.event.UserLoggedInEvent;
 import by.may.exception.UserNotFoundException;
 import by.may.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public Optional<User> authenticate(String username, String password) {
         User user = userRepository.findByUsername(username).orElseThrow(
@@ -24,6 +27,9 @@ public class AuthService {
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
             return Optional.empty();
         }
+
+        applicationEventPublisher.publishEvent(new UserLoggedInEvent(user.getUsername()));
+
         return Optional.of(user);
     }
 

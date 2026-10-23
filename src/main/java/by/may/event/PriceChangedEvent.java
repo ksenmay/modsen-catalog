@@ -2,7 +2,7 @@ package by.may.event;
 
 import java.math.BigDecimal;
 
-public record PriceChangeEvent(
+public record PriceChangedEvent(
         String productName,
         BigDecimal oldPrice,
         BigDecimal newPrice) {}

@@ -18,6 +18,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("select coalesce(avg(r.rating), 0.0) from Review r where r.product.id = :productId")
     double calculateAverageRating(@Param("productId") Long productId);
 
-    @Query("update Review r set r.deleted = true where r.product.id =: productId") //TODO пересмотреть
+    @Query("update Review r set r.deleted = true where r.product.id =: productId")
     int softDeleteByProductId(@Param("productId") Long productId);
 }

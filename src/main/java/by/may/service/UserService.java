@@ -8,11 +8,12 @@ import by.may.entity.User;
 import by.may.event.UserRoleChangedEvent;
 import by.may.exception.AdminMinLimitException;
 import by.may.exception.UserAlreadyExistsException;
+import by.may.exception.UserCannotDeleteYourselfException;
 import by.may.exception.UserNotFoundException;
-import by.may.listener.UserRoleChangedHandler;
 import by.may.mapper.UserMapper;
 import by.may.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,12 +29,16 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    private final UserRoleChangedHandler userRoleChangedHandler;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
     public UserResponse createUser(UserCreateRequest dto) {
         if (userRepository.existsByUsername(dto.username())) {
             throw new UserAlreadyExistsException("username", dto.username());
+        }
+
+        if (userRepository.existsByEmail(dto.email())) {
+            throw new UserAlreadyExistsException("email", dto.email());
         }
 
         String hash = passwordEncoder.encode(dto.password());
@@ -59,6 +64,7 @@ public class UserService {
 
     @Transactional
     public UserResponse changeRole(Long id, Role newRole) {
+
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
         if (user.getRole() == newRole) {
             return userMapper.toDto(user);
@@ -71,13 +77,17 @@ public class UserService {
         Role oldRole = user.getRole();
         user.setRole(newRole);
 
-        userRoleChangedHandler.handle(new UserRoleChangedEvent(user.getUsername(), oldRole, newRole));
+        applicationEventPublisher.publishEvent(new UserRoleChangedEvent(user.getUsername(), oldRole, newRole));
 
         return userMapper.toDto(user);
     }
 
     @Transactional
-    public void deleteUser(Long id) { //TODO пересмотреть позже, чтобы нельзя было удалить самого себя
+    public void deleteUser(Long id, Long currentUserId) {
+        if (id.equals(currentUserId)) {
+            throw new UserCannotDeleteYourselfException();
+        }
+
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
         if (user.getRole() == Role.ADMIN && userRepository.countByRole(Role.ADMIN) <= 1) {
             throw new AdminMinLimitException();
