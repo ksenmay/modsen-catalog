@@ -1,6 +1,5 @@
-package auth;
+package by.may.auth;
 
-import by.may.config.PasswordConfig;
 import by.may.entity.User;
 import by.may.exception.UserNotFoundException;
 import by.may.repository.UserRepository;
