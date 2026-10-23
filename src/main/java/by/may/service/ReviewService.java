@@ -3,6 +3,8 @@ package by.may.service;
 import by.may.dto.ReviewCreateRequest;
 import by.may.dto.ReviewResponse;
 import by.may.entity.Role;
+import by.may.event.ReviewAddedEvent;
+import by.may.event.ReviewDeletedEvent;
 import by.may.mapper.ReviewMapper;
 import by.may.entity.Product;
 import by.may.entity.Review;
@@ -12,8 +14,11 @@ import by.may.repository.ProductRepository;
 import by.may.repository.ReviewRepository;
 import by.may.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Currency;
 import java.util.Objects;
 
 @Service
@@ -24,8 +29,8 @@ public class ReviewService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final ReviewMapper reviewMapper;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
-    //TODO в этом метод надо будет пересмотреть получение текущего пользователя
     @Transactional
     public ReviewResponse createReview(Long productId, Long userId, ReviewCreateRequest dto) {
         User user = userRepository.findById(userId).orElseThrow(
@@ -42,6 +47,9 @@ public class ReviewService {
 
         Review review = reviewMapper.toEntity(dto, user, product);
         reviewRepository.save(review);
+
+        applicationEventPublisher.publishEvent(new ReviewAddedEvent(user.getUsername()));
+
         product.setAverageRating(reviewRepository.calculateAverageRating(productId));
 
         return reviewMapper.toDto(review);
@@ -67,15 +75,20 @@ public class ReviewService {
     }
 
     @Transactional
-    public void deleteReview(Long reviewId) {
+    public void deleteReview(Long reviewId, Long currentUserId) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(
                 () -> new ReviewNotFoundException(reviewId)
         );
 
-        User currentUser = null; //TODO исправить проверку на текущего пользователя
+        User currentUser = userRepository.findById(currentUserId).orElseThrow(
+                () -> new UserNotFoundException(currentUserId)
+        );
+
         if (review.getUser() == currentUser || review.getUser().getRole() != Role.ADMIN) {
             throw new ReviewNotWrittenByCurrentUserException(reviewId, currentUser.getId());
         }
+
+        applicationEventPublisher.publishEvent(new ReviewDeletedEvent(currentUser.getUsername()));
 
         reviewRepository.delete(review);
     }
