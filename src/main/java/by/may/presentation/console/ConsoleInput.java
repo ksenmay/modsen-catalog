@@ -1,5 +1,7 @@
 package by.may.presentation.console;
 
+import by.may.entity.Role;
+import by.may.service.UserSortField;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -79,6 +81,34 @@ public class ConsoleInput {
                 }
                 default -> ConsoleOutput.error("Введите y (д) или n (н)");
             }
+        }
+    }
+
+    public Role readRole(String message) {
+        while (true) {
+            String input = readLine(message).toLowerCase();
+            switch (input) {
+                case "admin" -> {
+                    return Role.ADMIN;
+                }
+                case "manager" -> {
+                    return Role.MANAGER;
+                }
+                case "customer" -> {
+                    return Role.CUSTOMER;
+                }
+                default -> ConsoleOutput.error("Неверная роль. Роли: ADMIN, MANAGER, CUSTOMER");
+            }
+        }
+
+    }
+
+    public UserSortField readUserSortField(String message) {
+        int choice = readInt(message, 1, 2);
+        if (choice == 1) {
+            return UserSortField.USERNAME;
+        } else {
+            return UserSortField.CREATED_AT;
         }
     }
 
