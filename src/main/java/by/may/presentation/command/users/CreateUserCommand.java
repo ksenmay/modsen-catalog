@@ -41,7 +41,7 @@ public class CreateUserCommand implements Command {
         Role role = consoleInput.readRole("Введите роль (ADMIN, MANAGER, CUSTOMER): ");
 
         UserCreateRequest dto = new UserCreateRequest(username, email, password, role);
-        UserResponse created = userService.createUser(dto);
+        userService.createUser(dto);
 
         ConsoleOutput.success("Пользователь " + username + " создан");
     }
