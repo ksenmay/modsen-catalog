@@ -20,14 +20,13 @@ public class SessionContext {
         this.currentUser = null;
     }
 
-    public User requireRole(Role role) {
+    public void requireRole(Role role) {
         if (!isLogged()) {
             throw new IllegalStateException("Session is not active");
         }
         if (currentUser.getRole() != role) {
             throw new AccessDeniedException("Current user " + currentUser.getUsername() + " don't have necessary permission");
         }
-        return currentUser;
     }
 
     public Role getCurrentUserRole() {
