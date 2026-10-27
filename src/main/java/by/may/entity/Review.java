@@ -26,7 +26,7 @@ public class Review {
     @Column(nullable = false)
     @Min(value = 1)
     @Max(value = 5)
-    private Integer rating;
+    private int rating;
 
     @Setter
     @Column(nullable = false)
@@ -47,9 +47,9 @@ public class Review {
 
     @Column(nullable = false)
     @Setter
-    private boolean isDeleted = false;
+    private boolean deleted = false;
 
-    public Review(int rating, String comment, User user, Product product, LocalDate createdAt) {
+    public Review(int rating, String comment, User user, Product product) {
         this.rating = rating;
         this.comment = comment;
         this.user = user;
@@ -57,7 +57,7 @@ public class Review {
     }
 
     public void markDelete() {
-        this.isDeleted = true;
+        this.deleted = true;
     }
 
     @PrePersist

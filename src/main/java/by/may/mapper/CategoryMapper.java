@@ -1,9 +1,11 @@
-package by.may.dto.mapper;
+package by.may.mapper;
 
 import by.may.dto.CategoryCreateRequest;
 import by.may.dto.CategoryResponse;
 import by.may.entity.Category;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CategoryMapper {
 
     public Category toEntity(CategoryCreateRequest dto) {
@@ -15,6 +17,7 @@ public class CategoryMapper {
 
     public CategoryResponse toDto(Category category) {
         return new CategoryResponse(
+                category.getId(),
                 category.getName(),
                 category.getDescription()
         );

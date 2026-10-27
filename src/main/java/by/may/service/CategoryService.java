@@ -2,12 +2,16 @@ package by.may.service;
 
 import by.may.dto.CategoryCreateRequest;
 import by.may.dto.CategoryResponse;
-import by.may.dto.mapper.CategoryMapper;
+import by.may.event.CategoryDeletedEvent;
+import by.may.exception.CategoryNotEmpty;
+import by.may.mapper.CategoryMapper;
 import by.may.entity.Category;
 import by.may.exception.CategoryAlreadyExistsException;
-import by.may.exception.CategoryNotFound;
+import by.may.exception.CategoryNotFoundException;
 import by.may.repository.CategoryRepository;
+import by.may.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,8 +24,11 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final ProductRepository productRepository;
 
-    CategoryResponse createCategory(CategoryCreateRequest dto) {
+    @Transactional
+    public CategoryResponse createCategory(CategoryCreateRequest dto) {
         if (categoryRepository.existsByName(dto.name())) {
             throw new CategoryAlreadyExistsException(dto.name());
         }
@@ -30,9 +37,9 @@ public class CategoryService {
     }
 
     @Transactional
-    CategoryResponse updateCategory(Long id, CategoryCreateRequest dto) {
+    public CategoryResponse updateCategory(Long id, CategoryCreateRequest dto) {
         Category category = categoryRepository.findById(id).orElseThrow(
-                () -> new CategoryNotFound(id)
+                () -> new CategoryNotFoundException(id)
         );
 
         if (!category.getName().equals(dto.name()) && categoryRepository.existsByName(dto.name())) {
@@ -44,21 +51,32 @@ public class CategoryService {
         return categoryMapper.toDto(category);
     }
 
-    void deleteCategory(Long id) {
+    @Transactional
+    public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id).orElseThrow(
-                () -> new CategoryNotFound(id)
+                () -> new CategoryNotFoundException(id)
         );
 
-        //TODO написать проверку для продуктов, которые лежат в категории
+        String categoryName = category.getName();
+
+        if (!categoryIsEmpty(id)) {
+            throw new CategoryNotEmpty(categoryName);
+        }
 
         categoryRepository.delete(category);
+
+        applicationEventPublisher.publishEvent(new CategoryDeletedEvent(categoryName));
     }
 
     @Transactional(readOnly = true)
-    List<CategoryResponse> getAllCategories() {
+    public List<CategoryResponse> getAllCategories() {
         return categoryRepository.findAll(Sort.by("name")).stream()
                 .map(categoryMapper::toDto)
                 .toList();
+    }
+
+    private boolean categoryIsEmpty(Long categoryId) {
+        return productRepository.existsAnyByCategoryId(categoryId);
     }
 
 }
