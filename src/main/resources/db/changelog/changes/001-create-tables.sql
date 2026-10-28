@@ -17,8 +17,8 @@ CREATE UNIQUE INDEX uq_users_username_active
 CREATE UNIQUE INDEX uq_users_email_active
     ON users (email) WHERE is_deleted = FALSE;
 
---changeset author:002-create-category
-CREATE TABLE category (
+--changeset author:002-create-categories
+CREATE TABLE categories (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,
     description VARCHAR(255)
@@ -31,7 +31,7 @@ CREATE TABLE products (
     description VARCHAR(255),
     price NUMERIC(12,2) NOT NULL CHECK (price > 0),
     average_rating DOUBLE PRECISION NOT NULL DEFAULT 0,
-    category_id BIGINT NOT NULL REFERENCES category (id),
+    category_id BIGINT NOT NULL REFERENCES categories (id),
     created_at DATE NOT NULL,
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE
 );

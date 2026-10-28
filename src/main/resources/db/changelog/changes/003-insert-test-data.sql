@@ -1,7 +1,7 @@
 --liquibase formatted sql
 
 --changeset author:007-insert-categories
-INSERT INTO category (name, description) VALUES
+INSERT INTO categories (name, description) VALUES
  ('Техника', 'Электроника и бытовые приборы'),
  ('Книги', 'Художественная и учебная литература'),
  ('Одежда', 'Одежда и обувь'),
@@ -39,7 +39,7 @@ FROM (VALUES
  ('Термокружка', 'Объём 450 мл, сохраняет тепло 6 часов', 22.00, 'Товары для дома'),
  ('Набор ножей', 'Шесть ножей с подставкой', 75.00, 'Товары для дома')
 ) AS p(name, description, price, category_name)
-JOIN category c ON c.name = p.category_name
+JOIN categories c ON c.name = p.category_name
 WHERE NOT EXISTS (
     SELECT 1 FROM products pr WHERE pr.name = p.name
 );
