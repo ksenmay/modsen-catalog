@@ -9,6 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
+@Table(name = "categories")
 public class Category {
 
     @Id
