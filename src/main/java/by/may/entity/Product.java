@@ -5,13 +5,13 @@ import jakarta.validation.constraints.Positive;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE product SET is_deleted = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE products SET is_deleted = true WHERE id = ?")
 @SQLRestriction("is_deleted = false")
+@Table(name = "products")
 @Getter
 @Entity
 public class Product {
@@ -41,7 +41,7 @@ public class Product {
     @Column(nullable = false, updatable = false)
     private LocalDate createdAt;
 
-    @Column(name = "is_delete", nullable = false)
+    @Column(name = "is_deleted", nullable = false)
     private boolean deleted = false;
 
     @Setter

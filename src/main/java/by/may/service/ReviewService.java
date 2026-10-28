@@ -1,5 +1,6 @@
 package by.may.service;
 
+import by.may.auth.SessionContext;
 import by.may.dto.ReviewCreateRequest;
 import by.may.dto.ReviewResponse;
 import by.may.entity.Role;
@@ -15,6 +16,8 @@ import by.may.repository.ReviewRepository;
 import by.may.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +32,7 @@ public class ReviewService {
     private final ProductRepository productRepository;
     private final ReviewMapper reviewMapper;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final SessionContext sessionContext;
 
     @Transactional
     public ReviewResponse createReview(Long productId, Long userId, ReviewCreateRequest dto) {
@@ -83,7 +87,7 @@ public class ReviewService {
                 () -> new UserNotFoundException(currentUserId)
         );
 
-        if (review.getUser() == currentUser || review.getUser().getRole() != Role.ADMIN) {
+        if (review.getUser() == currentUser || sessionContext.getCurrentUserRole().equals(Role.ADMIN)) {
             throw new ReviewNotWrittenByCurrentUserException(reviewId, currentUser.getId());
         }
 
@@ -91,4 +95,14 @@ public class ReviewService {
 
         reviewRepository.delete(review);
     }
+
+    @Transactional(readOnly = true)
+    public Page<ReviewResponse> getReviewsByProduct(Long productId, Pageable pageable) {
+        if (!productRepository.existsById(productId)) {
+            throw new ProductNotFoundException(productId);
+        }
+        return reviewRepository.findAllByProductId(productId, pageable)
+                .map(reviewMapper::toDto);
+    }
+
 }

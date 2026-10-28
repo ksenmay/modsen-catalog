@@ -1,20 +1,20 @@
 package by.may.repository;
 
 import by.may.entity.Product;
-import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
 
-@NoArgsConstructor
 public final class ProductSpecifications {
+
+    private ProductSpecifications() {}
 
     public static Specification<Product> nameContains(String name) {
         return (root, query, criteriaBuilder) -> {
             if (name == null || name.isBlank()) {
                 return null;
             }
-            return criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), name.toLowerCase());
+            return criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%");
         };
     }
 
