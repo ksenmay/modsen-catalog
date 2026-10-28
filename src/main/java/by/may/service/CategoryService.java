@@ -61,11 +61,12 @@ public class CategoryService {
         String categoryName = category.getName();
 
         if (!categoryIsEmpty(id)) {
+            categoryRepository.delete(category);
+            applicationEventPublisher.publishEvent(new CategoryDeletedEvent(categoryName));
+        } else {
             throw new CategoryNotEmpty(categoryName);
         }
 
-        categoryRepository.delete(category);
-        applicationEventPublisher.publishEvent(new CategoryDeletedEvent(categoryName));
     }
 
     @Transactional(readOnly = true)

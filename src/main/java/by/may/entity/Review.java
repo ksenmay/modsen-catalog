@@ -45,7 +45,7 @@ public class Review {
     @Column(nullable = false, updatable = false)
     private LocalDate createdAt;
 
-    @Column(nullable = false)
+    @Column(name = "is_deleted", nullable = false)
     @Setter
     private boolean deleted = false;
 

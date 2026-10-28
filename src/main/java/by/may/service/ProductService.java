@@ -94,10 +94,10 @@ public class ProductService {
     @Transactional(readOnly = true)
     public Page<ProductResponse> searchProducts(ProductSearchCriteria productSearchCriteria, Pageable pageable) {
         Specification<Product> specification = Specification
-                .where(ProductSpecifications.nameContains(productSearchCriteria.name())
-                        .and(ProductSpecifications.inCategory(productSearchCriteria.categoryId()))
-                        .and(ProductSpecifications.priceBetween(productSearchCriteria.minPrice(), productSearchCriteria.maxPrice()))
-                        .and(ProductSpecifications.minRating(productSearchCriteria.minRating())));
+                .where(ProductSpecifications.nameContains(productSearchCriteria.name()))
+                .and(ProductSpecifications.inCategory(productSearchCriteria.categoryId()))
+                .and(ProductSpecifications.priceBetween(productSearchCriteria.minPrice(), productSearchCriteria.maxPrice()))
+                .and(ProductSpecifications.minRating(productSearchCriteria.minRating()));
 
         PageRequest request = PageRequest.of(
                 pageable.getPageNumber(),
