@@ -1,11 +1,11 @@
 package by.may.presentation.console;
 
 import by.may.entity.Role;
+import by.may.service.ProductSortField;
 import by.may.service.UserSortField;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Scanner;
 
 @Component
@@ -26,14 +26,22 @@ public class ConsoleInput {
     public int readInt(String message, int min, int max) {
         while (true) {
             String input = readLine(message);
-            try {
-                int numInt = Integer.parseInt(input);
-                if (numInt >= min && numInt <= max) {
-                    return numInt;
-                }
-                ConsoleOutput.error("Введите число от " + min + " до " + max);
-            } catch (NumberFormatException e) {
-                ConsoleOutput.error("Введённое число не является целым. Введите целое число от " + min + " до " + max );
+            Integer num = ParseConsoleInput.parseInt(input, min, max);
+            if (num != null) {
+                return num;
+            }
+        }
+    }
+
+    public Double readOptionalRating(String message) {
+        while (true) {
+            String input = readLine(message);
+            if (input.isEmpty()) {
+                return null;
+            }
+            Double rating = ParseConsoleInput.parseDouble(input);
+            if (rating != null) {
+                return rating;
             }
         }
     }
@@ -41,14 +49,22 @@ public class ConsoleInput {
     public Long readLong(String message) {
         while (true) {
             String input = readLine(message);
-            try {
-                long id = Long.parseLong(input);
-                if (id > 0) {
-                    return id;
-                }
-                ConsoleOutput.error("ID должен быть положительным. Введите целое положительное число");
-            } catch (NumberFormatException e) {
-                ConsoleOutput.error("Введённое число не является целым. Введите целое положительное число");
+            Long id = ParseConsoleInput.parseLong(input);
+            if (id != null) {
+                return id;
+            }
+        }
+    }
+
+    public Long readOptionalLong(String message) {
+        while (true) {
+            String input = readLine(message);
+            if (input.isEmpty()) {
+                return null;
+            }
+            Long id = ParseConsoleInput.parseLong(input);
+            if (id != null) {
+                return id;
             }
         }
     }
@@ -56,14 +72,22 @@ public class ConsoleInput {
     public BigDecimal readPrice(String message) {
         while (true) {
             String input = readLine(message).replace(",", ".");
-            try {
-                BigDecimal price = new BigDecimal(input).setScale(2, RoundingMode.HALF_UP);
-                if (price.compareTo(new BigDecimal("0")) > 0) {
-                    return price;
-                }
-                ConsoleOutput.error("Цена должна быть положительным числом. Введите положительное (дробное) число");
-            } catch (NumberFormatException e) {
-                ConsoleOutput.error("Введённое значение не может быть ценой. Введите положительное (дробное) число");
+            BigDecimal price = ParseConsoleInput.parseBigDecimal(input);
+            if (price != null) {
+                return price;
+            }
+        }
+    }
+
+    public BigDecimal readOptionalPrice(String message) {
+        while (true) {
+            String input = readLine(message).replace(",", ".");
+            if (input.isEmpty()) {
+                return null;
+            }
+            BigDecimal price = ParseConsoleInput.parseBigDecimal(input);
+            if (price != null) {
+                return price;
             }
         }
     }
@@ -112,6 +136,17 @@ public class ConsoleInput {
         }
     }
 
+    public ProductSortField readProductSortField(String message) {
+        int choice = readInt(message, 1, 3);
+        if (choice == 1) {
+            return ProductSortField.PRICE;
+        } else if (choice == 2) {
+            return ProductSortField.AVERAGE_RATING;
+        } else {
+            return ProductSortField.CREATED_AT;
+        }
+    }
+
     public String readOptional(String message) {
         String input = readLine(message);
         if (input.isEmpty()) {
@@ -124,5 +159,4 @@ public class ConsoleInput {
         System.out.print(message);
         return scanner.nextLine().trim();
     }
-
 }
