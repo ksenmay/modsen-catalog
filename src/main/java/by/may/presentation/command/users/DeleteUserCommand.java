@@ -36,11 +36,11 @@ public class DeleteUserCommand implements Command {
         Long id = consoleInput.readLong("ID пользователя: ");
 
         if (currentUser.getId().equals(id)) {
-            ConsoleOutput.error("Нельзя удалить самого себя");
+            ConsoleOutput.error("Нельзя удалить самого себя\n");
             return;
         }
 
         userService.deleteUser(id, currentUser.getId());
-        ConsoleOutput.success("Пользователь с ID = " + id + " успешно удалён");
+        ConsoleOutput.success("Пользователь с ID = " + id + " успешно удалён\n");
     }
 }

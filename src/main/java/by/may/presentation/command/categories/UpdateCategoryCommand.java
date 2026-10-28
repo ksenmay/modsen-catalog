@@ -51,9 +51,9 @@ public class UpdateCategoryCommand implements Command {
         }
 
         CategoryCreateRequest dto = new CategoryCreateRequest(newName, description);
-        categoryService.createCategory(dto);
+        categoryService.updateCategory(response.id(), dto);
 
-        ConsoleOutput.success("Категория " + newName + " отредактирована");
+        ConsoleOutput.success("Категория " + newName + " отредактирована\n");
 
     }
 }

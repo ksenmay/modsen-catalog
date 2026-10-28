@@ -45,6 +45,5 @@ public class ChangeRoleCommand implements Command {
         }
 
         userService.changeRole(id, role);
-        ConsoleOutput.success("Роль пользователя обновлена");
     }
 }

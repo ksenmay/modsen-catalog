@@ -43,6 +43,6 @@ public class CreateUserCommand implements Command {
         UserCreateRequest dto = new UserCreateRequest(username, email, password, role);
         userService.createUser(dto);
 
-        ConsoleOutput.success("Пользователь " + username + " создан");
+        ConsoleOutput.success("Пользователь " + username + " создан\n");
     }
 }

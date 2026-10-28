@@ -29,7 +29,7 @@ public class ListCategoriesCommand implements Command {
 
     @Override
     public Set<Role> permissibleRoles() {
-        return Set.of(Role.ADMIN, Role.MANAGER);
+        return Set.of(Role.ADMIN, Role.MANAGER, Role.CUSTOMER);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class ListCategoriesCommand implements Command {
                 case "q" -> {
                     return;
                 }
-                default -> ConsoleOutput.error("Введите n / д, p / н, q / в");
+                default -> ConsoleOutput.error("Введите n / д, p / н, q / в\n");
             }
         }
     }

@@ -52,6 +52,6 @@ public class UpdateUserCommand implements Command {
 
         UserUpdateRequest dto = new UserUpdateRequest(username, email);
         userService.updateUser(id, dto);
-        ConsoleOutput.success("Данные пользователя обновлены");
+        ConsoleOutput.success("Данные пользователя обновлены\n");
     }
 }

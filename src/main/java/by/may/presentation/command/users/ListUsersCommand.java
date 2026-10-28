@@ -39,7 +39,7 @@ public class ListUsersCommand implements Command {
         UserSortField sortField = consoleInput.readUserSortField("1 - сортировка по имени пользователя, " +
                 "\n2 - сортировка по дате создания");
 
-        boolean asc = consoleInput.isConfirm("По возрастанию?");
+        boolean asc = consoleInput.isConfirm("По возрастанию?\n");
 
         int page = 0;
         while (true) {
@@ -61,9 +61,8 @@ public class ListUsersCommand implements Command {
                 case "q" -> {
                     return;
                 }
-                default -> ConsoleOutput.error("Введите n / д, p / н, q / в");
+                default -> ConsoleOutput.error("Введите n / д, p / н, q / в\n");
             }
         }
-
     }
 }

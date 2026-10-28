@@ -40,6 +40,6 @@ public class CreateCategoryCommand implements Command {
         CategoryCreateRequest dto = new CategoryCreateRequest(name, description);
         categoryService.createCategory(dto);
 
-        ConsoleOutput.success("Категория " + name + " создана");
+        ConsoleOutput.success("Категория " + name + " создана\n");
     }
 }

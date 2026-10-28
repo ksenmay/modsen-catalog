@@ -39,8 +39,6 @@ public class DeleteCategoryCommand implements Command {
         CategoryResponse response = categoryService.getCategoryByName(name);
 
         categoryService.deleteCategory(response.id());
-
-        ConsoleOutput.success("Категория " + name + " удалена");
     }
 
 }
