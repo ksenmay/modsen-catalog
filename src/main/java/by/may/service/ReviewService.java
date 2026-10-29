@@ -88,7 +88,7 @@ public class ReviewService {
         );
 
         if (review.getUser() == currentUser || sessionContext.getCurrentUserRole().equals(Role.ADMIN)) {
-            throw new ReviewNotWrittenByCurrentUserException(reviewId, currentUser.getId());
+            throw new ReviewNotWrittenByUserException(reviewId, currentUser.getId());
         }
 
         applicationEventPublisher.publishEvent(new ReviewDeletedEvent(currentUser.getUsername()));
