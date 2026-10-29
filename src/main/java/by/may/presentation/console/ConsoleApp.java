@@ -20,12 +20,12 @@ public class ConsoleApp implements CommandLineRunner {
     private final CommandInvoker invoker;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         while (true) {
             List<Command> commands = menu.availableCommands();
             log.error(String.valueOf(commands.size()));
             if (commands.isEmpty()) {
-                ConsoleOutput.error("Внутренняя ошибка 1");
+                ConsoleOutput.error("Внутренняя ошибка");
                 return;
             }
             menu.print(commands);
