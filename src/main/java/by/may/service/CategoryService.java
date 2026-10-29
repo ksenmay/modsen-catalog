@@ -77,6 +77,14 @@ public class CategoryService {
         return categoryMapper.toDto(category);
     }
 
+    @Transactional
+    public CategoryResponse getCategoryById(Long id) {
+        Category category = categoryRepository.findById(id).orElseThrow(
+                () -> new CategoryNotFoundException(id)
+        );
+        return categoryMapper.toDto(category);
+    }
+
     @Transactional(readOnly = true)
     public Page<CategoryResponse> getCategories(Pageable pageable) {
         Pageable sorted = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("name"));
