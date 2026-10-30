@@ -6,6 +6,8 @@ import lombok.Getter;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
+import java.util.Set;
+
 @Getter
 @Component
 public class SessionContext {
@@ -30,6 +32,15 @@ public class SessionContext {
         return currentUser;
     }
 
+    public void requireAnyRole(Set<Role> roles) {
+        if (!isLogged()) {
+            throw new IllegalStateException("Session is not active");
+        }
+        if (!roles.contains(currentUser.getRole())) {
+            throw new AccessDeniedException("Current user " + currentUser.getUsername() + " don't have necessary permission");
+        }
+    }
+
     public Role getCurrentUserRole() {
         if (!isLogged()) {
             throw new IllegalStateException("Session is not active");
@@ -37,7 +48,7 @@ public class SessionContext {
         return currentUser.getRole();
     }
 
-    private boolean isLogged() {
+    public boolean isLogged() {
         return currentUser != null;
     }
 
