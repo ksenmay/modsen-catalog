@@ -10,6 +10,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Entity
@@ -46,6 +47,12 @@ public class User {
 
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted = false;
+
+    @Column(name="refresh_token", length=255)
+    private String refreshToken;
+
+    @Column(name = "refresh_token_expiry_time")
+    private LocalDateTime refreshTokenExpiryTime;
 
     public User(String username, String email, String passwordHash, Role role) {
         this.username = username;
