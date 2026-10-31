@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PriceHistoryMapper {
 
-    public PriceHistoryResponse toResponse(PriceHistory model) {
+    public PriceHistoryResponse toDto(PriceHistory model) {
         return new PriceHistoryResponse(
                 model.getId(),
                 model.getProductId(),
@@ -15,5 +15,5 @@ public class PriceHistoryMapper {
                 model.getNewPrice(),
                 model.getChangedAt());
     }
-
+    
 }

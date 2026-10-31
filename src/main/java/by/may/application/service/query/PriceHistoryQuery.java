@@ -5,5 +5,5 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface PriceHistoryQuery {
-    Page<PriceHistoryResponse> getHistory(Long productId, Pageable pageable);
+    Page<PriceHistoryResponse> getHistory(Long productId);
 }

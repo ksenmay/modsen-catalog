@@ -17,8 +17,8 @@ public class PriceHistoryService implements PriceHistoryQuery {
     private final PriceHistoryMapper priceHistoryMapper;
 
     @Transactional(readOnly = true)
-    public Page<PriceHistoryResponse> getHistory(Long productId, Pageable pageable) {
-        return priceHistoryRepositoryPort.findAllByProductId(productId, pageable).map(priceHistoryMapper::toResponse);
+    public Page<PriceHistoryResponse> getHistory(Long productId) {
+        return priceHistoryRepositoryPort.findAllByProductId(productId).map(priceHistoryMapper::toDto);
     }
 
 }

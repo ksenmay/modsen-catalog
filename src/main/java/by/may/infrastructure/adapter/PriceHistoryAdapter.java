@@ -9,7 +9,6 @@ import by.may.infrastructure.repository.PriceHistoryRepository;
 import by.may.infrastructure.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -29,7 +28,12 @@ public class PriceHistoryAdapter implements PriceHistoryRepositoryPort {
     }
 
     @Override
-    public Page<PriceHistory> findAllByProductId(Long productId, Pageable pageable) {
-        return repository.findAllByProductId(productId, pageable).map(jpaMapper::toModel);
+    public Page<PriceHistory> findAllByProductId(Long productId) {
+        return repository.findAllByProductId(productId).map(jpaMapper::toModel);
+    }
+
+    @Override
+    public void softDeleteByProductId(Long productId) {
+        repository.softDeleteByProductId(productId);
     }
 }
