@@ -1,4 +1,4 @@
-package by.may.application.event;
+package by.may.infrastructure.event;
 
 import java.math.BigDecimal;
 

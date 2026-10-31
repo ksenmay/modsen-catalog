@@ -1,4 +1,4 @@
-package by.may.application.event;
+package by.may.infrastructure.event;
 
 public record CategoryDeletedEvent(
         String categoryName) {}
