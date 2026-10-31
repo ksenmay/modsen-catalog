@@ -1,7 +1,9 @@
 package by.may.web.controllers;
 
+import by.may.application.dto.PriceHistoryResponse;
 import by.may.application.dto.ProductCreateRequest;
 import by.may.application.dto.ProductResponse;
+import by.may.application.service.PriceHistoryService;
 import by.may.application.service.ProductSearchCriteria;
 import by.may.application.service.ProductService;
 import by.may.application.service.ProductSortField;
@@ -21,6 +23,7 @@ import java.math.BigDecimal;
 public class ProductController {
 
     private final ProductService productService;
+    private final PriceHistoryService priceHistoryService;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK) //todo пересмотреть, удобно ли будет вынести критерию в параметры метода
@@ -61,6 +64,12 @@ public class ProductController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         productService.deleteProduct(id);
+    }
+
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Page<PriceHistoryResponse> getPriceHistory(@PathVariable Long id) {
+        return priceHistoryService.getHistory(id);
     }
 
 }
