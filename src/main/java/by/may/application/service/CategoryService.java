@@ -14,6 +14,7 @@ import by.may.domain.exception.CategoryNotFoundException;
 import by.may.infrastructure.event.CategoryDeletedEvent;
 import by.may.infrastructure.event.EventPublisher;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CategoryService implements CategoryCommand, CategoryQuery {
 
     private final CategoryRepositoryPort categoryRepositoryPort;
@@ -33,9 +35,11 @@ public class CategoryService implements CategoryCommand, CategoryQuery {
     @Transactional
     public CategoryResponse createCategory(CategoryCreateRequest dto) {
         if (categoryRepositoryPort.existsByName(dto.name())) {
+            log.error("категория с {} уже существует", dto.name());
             throw new CategoryAlreadyExistsException(dto.name());
         }
         Category category = categoryMapper.toModel(dto);
+        log.info("создана категория {}", dto.name());
         return categoryMapper.toDto(categoryRepositoryPort.save(category));
     }
 
@@ -46,12 +50,15 @@ public class CategoryService implements CategoryCommand, CategoryQuery {
         );
 
         if (!category.getName().equals(dto.name()) && categoryRepositoryPort.existsByName(dto.name())) {
+            log.error("нельзя поменять название категории {}, так как категория с {} уже существует",
+                    category.getName(), dto.name());
             throw new CategoryAlreadyExistsException(dto.name());
         }
 
         category.setName(dto.name());
         category.setDescription(dto.description());
 
+        log.info("изменена категория {}, {}", id, category.getName());
         return categoryMapper.toDto(categoryRepositoryPort.save(category));
     }
 
@@ -66,7 +73,9 @@ public class CategoryService implements CategoryCommand, CategoryQuery {
         if (!productRepositoryPort.existsAnyByCategoryId(id)) {
             categoryRepositoryPort.delete(category.getId());
             publisher.publish(new CategoryDeletedEvent(categoryName));
+            log.info("удалена категория {}, {}", id, category.getName());
         } else {
+            log.error("категория {}, {} не удалена, так как не пуста", id, category.getName());
             throw new CategoryNotEmpty(categoryName);
         }
     }
