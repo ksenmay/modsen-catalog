@@ -12,6 +12,9 @@ import by.may.domain.Role;
 import by.may.application.mapper.ReviewMapper;
 import by.may.domain.model.Product;
 import by.may.domain.model.Review;
+import by.may.infrastructure.event.EventPublisher;
+import by.may.infrastructure.event.ReviewAddedEvent;
+import by.may.infrastructure.event.ReviewDeletedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +29,7 @@ public class ReviewService implements ReviewCommand, ReviewQuery {
     private final UserRepositoryPort userRepositoryPort;
     private final ProductRepositoryPort productRepositoryPort;
     private final ReviewMapper reviewMapper;
+    private final EventPublisher publisher;
 
     @Transactional
     public ReviewResponse createReview(Long productId, Long userId, ReviewCreateRequest dto) {
@@ -42,6 +46,7 @@ public class ReviewService implements ReviewCommand, ReviewQuery {
         }
 
         product.setAverageRating(reviewRepositoryPort.calculateAverageRating(productId));
+        publisher.publish(new ReviewAddedEvent());
         return reviewMapper.toDto(reviewRepositoryPort.save(reviewMapper.toModel(dto)));
     }
 
@@ -77,6 +82,7 @@ public class ReviewService implements ReviewCommand, ReviewQuery {
         }
 
         reviewRepositoryPort.delete(reviewId);
+        publisher.publish(new ReviewDeletedEvent());
     }
 
     @Transactional(readOnly = true)

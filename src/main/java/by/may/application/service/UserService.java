@@ -15,6 +15,8 @@ import by.may.domain.exception.UserAlreadyExistsException;
 import by.may.domain.exception.UserCannotDeleteYourselfException;
 import by.may.domain.exception.UserNotFoundException;
 import by.may.application.mapper.UserMapper;
+import by.may.infrastructure.event.EventPublisher;
+import by.may.infrastructure.event.UserRoleChangedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +32,7 @@ public class UserService implements UserCommand, UserQuery {
     private final UserRepositoryPort userRepositoryPort;
     private final UserMapper userMapper;
     private final PasswordHasher passwordHasher;
+    private final EventPublisher publisher;
 
     @Transactional
     public UserResponse createUser(UserCreateRequest dto) {
@@ -70,15 +73,18 @@ public class UserService implements UserCommand, UserQuery {
                 () -> new UserNotFoundException(id)
         );
 
-        if (user.getRole() == newRole) {
+        Role oldRole = user.getRole();
+
+        if (oldRole == newRole) {
             return userMapper.toDto(user);
         }
 
-        if (user.getRole() == Role.ADMIN && userRepositoryPort.countByRole(Role.ADMIN) <= 1) {
+        if (oldRole == Role.ADMIN && userRepositoryPort.countByRole(Role.ADMIN) <= 1) {
             throw new AdminMinLimitException();
         }
 
         user.setRole(newRole);
+        publisher.publish(new UserRoleChangedEvent(user.getUsername(), oldRole, newRole));
         return userMapper.toDto(user);
     }
 

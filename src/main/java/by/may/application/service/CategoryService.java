@@ -11,6 +11,8 @@ import by.may.application.mapper.CategoryMapper;
 import by.may.domain.model.Category;
 import by.may.domain.exception.CategoryAlreadyExistsException;
 import by.may.domain.exception.CategoryNotFoundException;
+import by.may.infrastructure.event.CategoryDeletedEvent;
+import by.may.infrastructure.event.EventPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +28,7 @@ public class CategoryService implements CategoryCommand, CategoryQuery {
     private final CategoryRepositoryPort categoryRepositoryPort;
     private final CategoryMapper categoryMapper;
     private final ProductRepositoryPort productRepositoryPort;
+    private final EventPublisher publisher;
 
     @Transactional
     public CategoryResponse createCategory(CategoryCreateRequest dto) {
@@ -62,6 +65,7 @@ public class CategoryService implements CategoryCommand, CategoryQuery {
 
         if (!productRepositoryPort.existsAnyByCategoryId(id)) {
             categoryRepositoryPort.delete(category.getId());
+            publisher.publish(new CategoryDeletedEvent(categoryName));
         } else {
             throw new CategoryNotEmpty(categoryName);
         }

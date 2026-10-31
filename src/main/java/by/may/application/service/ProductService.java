@@ -12,6 +12,9 @@ import by.may.domain.model.PriceHistory;
 import by.may.domain.model.Product;
 import by.may.application.mapper.ProductMapper;
 import by.may.domain.exception.ProductNotFoundException;
+import by.may.infrastructure.event.EventPublisher;
+import by.may.infrastructure.event.PriceChangedEvent;
+import by.may.infrastructure.event.ProductDeletedEvent;
 import by.may.infrastructure.repository.PriceHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,6 +32,7 @@ public class ProductService implements ProductCommand, ProductQuery {
     private final ProductMapper productMapper;
     private final PriceHistoryRepositoryPort priceHistoryRepositoryPort;
     private final ReviewRepositoryPort reviewRepositoryPort;
+    private final EventPublisher publisher;
 
     @Transactional
     public ProductResponse createProduct(ProductCreateRequest dto) {
@@ -56,6 +60,7 @@ public class ProductService implements ProductCommand, ProductQuery {
         if (priceChanged) {
             PriceHistory priceHistory = new PriceHistory(id, oldPrice, newPrice);
             priceHistoryRepositoryPort.save(priceHistory);
+            publisher.publish(new PriceChangedEvent(product.getName(), oldPrice, newPrice));
         }
 
         return productMapper.toDto(productRepositoryPort.save(product));
@@ -69,6 +74,7 @@ public class ProductService implements ProductCommand, ProductQuery {
         reviewRepositoryPort.softDeleteByProductId(id);
         priceHistoryRepositoryPort.softDeleteByProductId(id);
         productRepositoryPort.delete(product.getId());
+        publisher.publish(new ProductDeletedEvent(product.getName()));
     }
 
     @Transactional(readOnly = true)
