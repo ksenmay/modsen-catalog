@@ -8,6 +8,6 @@ import org.springframework.stereotype.Component;
 public class ReviewAddedHandler {
     @EventListener
     public void handle(ReviewAddedEvent event) {
-        System.out.print(event.username() + ", спасибо за отзыв!");
+        System.out.print("Спасибо за отзыв!");
     }
 }

@@ -8,6 +8,6 @@ import org.springframework.stereotype.Component;
 public class ReviewDeletedHandler {
     @EventListener
     public void handle(ReviewDeletedEvent event) {
-        System.out.print(event.username() + ", Ваш отзыв удален");
+        System.out.print("Отзыв удален");
     }
 }
