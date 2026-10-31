@@ -1,4 +1,4 @@
-package by.may.exception;
+package by.may.domain.exception;
 
 public class UserAlreadyAddReviewForProduct extends RuntimeException {
     public UserAlreadyAddReviewForProduct(Long userId, Long productId) {

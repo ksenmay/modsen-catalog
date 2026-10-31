@@ -1,4 +1,4 @@
-package by.may.exception;
+package by.may.domain.exception;
 
 public class ProductNotFoundException extends RuntimeException {
     public ProductNotFoundException(Long id) {
