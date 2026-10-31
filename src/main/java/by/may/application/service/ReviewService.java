@@ -16,6 +16,7 @@ import by.may.infrastructure.event.EventPublisher;
 import by.may.infrastructure.event.ReviewAddedEvent;
 import by.may.infrastructure.event.ReviewDeletedEvent;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ReviewService implements ReviewCommand, ReviewQuery {
 
     private final ReviewRepositoryPort reviewRepositoryPort;
@@ -34,6 +36,7 @@ public class ReviewService implements ReviewCommand, ReviewQuery {
     @Transactional
     public ReviewResponse createReview(Long productId, Long userId, ReviewCreateRequest dto) {
         if (!userRepositoryPort.existsById(userId)) {
+            log.error("пользователь {} не найден", userId);
             throw new UserNotFoundException(userId);
         }
 
@@ -42,11 +45,14 @@ public class ReviewService implements ReviewCommand, ReviewQuery {
         );
 
         if (reviewRepositoryPort.existsByUserIdAndProductId(userId, productId)) {
+            log.error("пользователь {} уже писал отзыв на продукт {}",
+                    userId, productId);
             throw new UserAlreadyAddReviewForProduct(userId, productId);
         }
 
         product.setAverageRating(reviewRepositoryPort.calculateAverageRating(productId));
         publisher.publish(new ReviewAddedEvent());
+        log.info("создан отзыв на продукт {}", product.getName());
         return reviewMapper.toDto(reviewRepositoryPort.save(reviewMapper.toModel(dto)));
     }
 
@@ -57,6 +63,8 @@ public class ReviewService implements ReviewCommand, ReviewQuery {
         );
 
         if (!review.getUserId().equals(userId)) {
+            log.error("отзыв {} на продукт {} не написан пользователем {}",
+                    reviewId, review.getProductId(), userId);
             throw new ReviewNotWrittenByUserException(userId, reviewId);
         }
 
@@ -68,6 +76,7 @@ public class ReviewService implements ReviewCommand, ReviewQuery {
         );
 
         product.setAverageRating(reviewRepositoryPort.calculateAverageRating(product.getId()));
+        log.info("измененён отзыв {} на продукт {}", review.getId(), product.getName());
         return reviewMapper.toDto(reviewRepositoryPort.save(review));
     }
 
@@ -78,16 +87,20 @@ public class ReviewService implements ReviewCommand, ReviewQuery {
         );
 
         if (!review.getUserId().equals(currentUserId) || currentUserRole != Role.ADMIN) {
+            log.error("отзыв {} на продукт {} не написан пользователем {} или администратором",
+                    reviewId, review.getProductId(), currentUserId);
             throw new ReviewNotWrittenByUserException(reviewId, currentUserId);
         }
 
         reviewRepositoryPort.delete(reviewId);
         publisher.publish(new ReviewDeletedEvent());
+        log.info("удалён отзыв {} на продукт {}", review.getId(), review.getProductId());
     }
 
     @Transactional(readOnly = true)
     public Page<ReviewResponse> getReviewsByProduct(Long productId, Pageable pageable) {
         if (!productRepositoryPort.existsById(productId)) {
+            log.error("продукт {} не существует", productId);
             throw new ProductNotFoundException(productId);
         }
         return reviewRepositoryPort.findAllByProductId(productId, pageable)

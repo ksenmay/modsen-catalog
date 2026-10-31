@@ -17,6 +17,7 @@ import by.may.infrastructure.event.PriceChangedEvent;
 import by.may.infrastructure.event.ProductDeletedEvent;
 import by.may.infrastructure.repository.PriceHistoryRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProductService implements ProductCommand, ProductQuery {
 
     private final ProductRepositoryPort productRepositoryPort;
@@ -37,6 +39,7 @@ public class ProductService implements ProductCommand, ProductQuery {
     @Transactional
     public ProductResponse createProduct(ProductCreateRequest dto) {
         Product product = productMapper.toModel(dto);
+        log.info("создан продукт {}", dto.name());
         return productMapper.toDto(productRepositoryPort.save(product));
     }
 
@@ -63,6 +66,7 @@ public class ProductService implements ProductCommand, ProductQuery {
             publisher.publish(new PriceChangedEvent(product.getName(), oldPrice, newPrice));
         }
 
+        log.info("изменён продукт {}, {}", product.getId(), product.getName());
         return productMapper.toDto(productRepositoryPort.save(product));
     }
 
@@ -75,6 +79,7 @@ public class ProductService implements ProductCommand, ProductQuery {
         priceHistoryRepositoryPort.softDeleteByProductId(id);
         productRepositoryPort.delete(product.getId());
         publisher.publish(new ProductDeletedEvent(product.getName()));
+        log.info("удалён продукт {}, {}, отзывы на него и история цен", product.getId(), product.getName());
     }
 
     @Transactional(readOnly = true)
