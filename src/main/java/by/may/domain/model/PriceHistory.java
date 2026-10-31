@@ -17,6 +17,12 @@ public class PriceHistory {
     private BigDecimal newPrice;
     private LocalDateTime changedAt;
 
+    public PriceHistory(Long productId, BigDecimal oldPrice, BigDecimal newPrice) {
+        this.productId = productId;
+        this.oldPrice = oldPrice;
+        this.newPrice = newPrice;
+    }
+
     public PriceHistory(Long id, Long productId, BigDecimal oldPrice, BigDecimal newPrice, LocalDateTime changedAt) {
         this.id = id;
         this.productId = productId;
