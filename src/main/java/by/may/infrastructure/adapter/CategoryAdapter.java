@@ -1,6 +1,5 @@
 package by.may.infrastructure.adapter;
 
-import by.may.application.event.CategoryDeletedEvent;
 import by.may.application.port.CategoryRepositoryPort;
 import by.may.domain.exception.CategoryNotFoundException;
 import by.may.domain.model.Category;
@@ -8,7 +7,6 @@ import by.may.infrastructure.entity.CategoryJpaEntity;
 import by.may.infrastructure.mapper.CategoryJpaMapper;
 import by.may.infrastructure.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -20,7 +18,6 @@ import java.util.Optional;
 public class CategoryAdapter implements CategoryRepositoryPort {
 
     private final CategoryRepository repository;
-    private final ApplicationEventPublisher applicationEventPublisher;
     private final CategoryJpaMapper jpaMapper;
 
     @Override
@@ -48,9 +45,7 @@ public class CategoryAdapter implements CategoryRepositoryPort {
         CategoryJpaEntity entity = repository.findById(id).orElseThrow(
                 () -> new CategoryNotFoundException(id)
         );
-        String name = entity.getName();
         repository.delete(entity);
-        applicationEventPublisher.publishEvent(new CategoryDeletedEvent(name));
     }
 
     @Override

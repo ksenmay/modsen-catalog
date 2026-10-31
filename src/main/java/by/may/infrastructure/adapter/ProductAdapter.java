@@ -1,6 +1,5 @@
 package by.may.infrastructure.adapter;
 
-import by.may.application.event.ProductDeletedEvent;
 import by.may.application.port.ProductRepositoryPort;
 import by.may.application.service.ProductSearchCriteria;
 import by.may.domain.exception.CategoryNotFoundException;
@@ -13,7 +12,6 @@ import by.may.infrastructure.repository.CategoryRepository;
 import by.may.infrastructure.repository.ProductRepository;
 import by.may.infrastructure.repository.ProductSpecifications;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +27,6 @@ public class ProductAdapter implements ProductRepositoryPort {
 
     private final ProductRepository repository;
     private final ProductJpaMapper jpaMapper;
-    private final ApplicationEventPublisher applicationEventPublisher;
     private final CategoryRepository categoryRepository;
 
     @Override
@@ -60,9 +57,7 @@ public class ProductAdapter implements ProductRepositoryPort {
         ProductJpaEntity entity = repository.findById(id).orElseThrow(
                 () -> new ProductNotFoundException(id)
         );
-        String name = entity.getName();
         repository.delete(entity);
-        applicationEventPublisher.publishEvent(new ProductDeletedEvent(name));
     }
 
     @Override

@@ -1,6 +1,6 @@
 package by.may.infrastructure.listener;
 
-import by.may.application.event.ReviewAddedEvent;
+import by.may.infrastructure.event.ReviewAddedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 

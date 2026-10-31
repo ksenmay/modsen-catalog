@@ -42,10 +42,10 @@ public class ReviewAdapter implements ReviewRepositoryPort {
 
     @Override
     public void delete(Long id) {
-        ReviewJpaEntity entity = repository.findById(id).orElseThrow(
+        ReviewJpaEntity review = repository.findById(id).orElseThrow(
                 () -> new ReviewNotFoundException(id)
         );
-        repository.delete(entity);
+        repository.delete(review);
     }
 
     @Override

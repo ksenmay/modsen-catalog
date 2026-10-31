@@ -23,7 +23,6 @@ public class PriceHistoryAdapter implements PriceHistoryRepositoryPort {
         ProductJpaEntity product = productRepository.findById(priceHistory.getProductId())
                 .orElseThrow(() -> new ProductNotFoundException(priceHistory.getProductId())
                 );
-
         return jpaMapper.toModel(repository.save(jpaMapper.toEntity(priceHistory, product)));
     }
 

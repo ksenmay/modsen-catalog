@@ -26,7 +26,7 @@ public class ProductController {
     private final PriceHistoryService priceHistoryService;
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK) //todo пересмотреть, удобно ли будет вынести критерию в параметры метода
+    @ResponseStatus(HttpStatus.OK)
     public Page<ProductResponse> search(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Long categoryId,
