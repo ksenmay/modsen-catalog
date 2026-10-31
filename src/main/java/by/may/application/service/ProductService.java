@@ -2,12 +2,17 @@ package by.may.application.service;
 
 import by.may.application.dto.ProductCreateRequest;
 import by.may.application.dto.ProductResponse;
+import by.may.application.mapper.PriceHistoryMapper;
+import by.may.application.port.PriceHistoryRepositoryPort;
 import by.may.application.port.ProductRepositoryPort;
+import by.may.application.port.ReviewRepositoryPort;
 import by.may.application.service.command.ProductCommand;
 import by.may.application.service.query.ProductQuery;
+import by.may.domain.model.PriceHistory;
 import by.may.domain.model.Product;
 import by.may.application.mapper.ProductMapper;
 import by.may.domain.exception.ProductNotFoundException;
+import by.may.infrastructure.repository.PriceHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +27,8 @@ public class ProductService implements ProductCommand, ProductQuery {
 
     private final ProductRepositoryPort productRepositoryPort;
     private final ProductMapper productMapper;
-    //private final PriceHistoryRepository priceHistoryRepository;
+    private final PriceHistoryRepositoryPort priceHistoryRepositoryPort;
+    private final ReviewRepositoryPort reviewRepositoryPort;
 
     @Transactional
     public ProductResponse createProduct(ProductCreateRequest dto) {
@@ -47,8 +53,9 @@ public class ProductService implements ProductCommand, ProductQuery {
 
         product.setPrice(newPrice);
 
-        if (priceChanged) { //todo добавить сюда price history
-
+        if (priceChanged) {
+            PriceHistory priceHistory = new PriceHistory(id, oldPrice, newPrice);
+            priceHistoryRepositoryPort.save(priceHistory);
         }
 
         return productMapper.toDto(productRepositoryPort.save(product));
@@ -59,9 +66,8 @@ public class ProductService implements ProductCommand, ProductQuery {
         Product product = productRepositoryPort.findById(id).orElseThrow(
                 () -> new ProductNotFoundException(id)
         );
-
-        String productName = product.getName();
-        //reviewRepositoryPort.softDeleteByProductId(id);
+        reviewRepositoryPort.softDeleteByProductId(id);
+        priceHistoryRepositoryPort.softDeleteByProductId(id);
         productRepositoryPort.delete(product.getId());
     }
 
