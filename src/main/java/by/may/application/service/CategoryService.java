@@ -2,17 +2,17 @@ package by.may.application.service;
 
 import by.may.application.dto.CategoryCreateRequest;
 import by.may.application.dto.CategoryResponse;
+import by.may.application.mapper.CategoryMapper;
 import by.may.application.port.CategoryRepositoryPort;
+import by.may.application.port.EventPublisher;
 import by.may.application.port.ProductRepositoryPort;
 import by.may.application.service.command.CategoryCommand;
 import by.may.application.service.query.CategoryQuery;
-import by.may.domain.exception.CategoryNotEmpty;
-import by.may.application.mapper.CategoryMapper;
-import by.may.domain.model.Category;
+import by.may.domain.event.CategoryDeletedEvent;
 import by.may.domain.exception.CategoryAlreadyExistsException;
+import by.may.domain.exception.CategoryNotEmpty;
 import by.may.domain.exception.CategoryNotFoundException;
-import by.may.infrastructure.event.CategoryDeletedEvent;
-import by.may.infrastructure.event.EventPublisher;
+import by.may.domain.model.Category;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -75,7 +75,7 @@ public class CategoryService implements CategoryCommand, CategoryQuery {
             publisher.publish(new CategoryDeletedEvent(categoryName));
             log.info("удалена категория {}, {}", id, category.getName());
         } else {
-            log.error("категория {}, {} не удалена, так как не пуста", id, category.getName());
+            log.error("Категория {}, {} не удалена, так как не пуста", id, category.getName());
             throw new CategoryNotEmpty(categoryName);
         }
     }

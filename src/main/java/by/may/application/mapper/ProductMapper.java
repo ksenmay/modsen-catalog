@@ -3,8 +3,6 @@ package by.may.application.mapper;
 import by.may.application.dto.ProductCreateRequest;
 import by.may.application.dto.ProductResponse;
 import by.may.domain.model.Product;
-import by.may.infrastructure.entity.CategoryJpaEntity;
-import by.may.infrastructure.entity.ProductJpaEntity;
 import org.springframework.stereotype.Component;
 
 @Component

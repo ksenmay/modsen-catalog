@@ -21,7 +21,7 @@ public class ReviewController {
 
     @GetMapping("/api/products/{productId}/reviews")
     @ResponseStatus(HttpStatus.OK)
-    public Page<ReviewResponse> getByProduct (@PathVariable Long productId,
+    public Page<ReviewResponse> getByProduct    (@PathVariable Long productId,
                                               @PageableDefault(size = 10, sort = "createdAt",
             direction = Sort.Direction.DESC) Pageable pageable) {
         return reviewService.getReviewsByProduct(productId, pageable);
@@ -29,10 +29,8 @@ public class ReviewController {
 
     @PostMapping("/api/products/{productId}/reviews")
     @ResponseStatus(HttpStatus.CREATED)
-    public ReviewResponse create (@PathVariable Long productId,
-                                  @Valid @RequestBody ReviewCreateRequest dto,
-                                  Long userId) {
-        return reviewService.createReview(productId, userId, dto);
+    public ReviewResponse create (@Valid @RequestBody ReviewCreateRequest dto) {
+        return reviewService.createReview(dto);
     }
 
     @PutMapping("/api/products/{productId}/reviews")
@@ -40,7 +38,7 @@ public class ReviewController {
     public ReviewResponse update (@PathVariable Long productId,
                                   @Valid @RequestBody ReviewCreateRequest dto,
                                   Long userId) {
-        return reviewService.updateReview(productId, userId, dto);
+        return reviewService.updateReview(productId, dto);
     }
 
     @DeleteMapping("/api/products/{productId}/reviews")

@@ -1,6 +1,6 @@
 package by.may.infrastructure.listener;
 
-import by.may.infrastructure.event.ProductDeletedEvent;
+import by.may.domain.event.ProductDeletedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 

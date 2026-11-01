@@ -20,4 +20,5 @@ public interface UserRepositoryPort {
     long countByRole(Role role);
     Page<User> findAll(Pageable pageable);
     Page<User> findAll(UserSortField sortField, boolean asc, Pageable pageable);
+    Optional<User> findByRefreshToken(String refreshToken);
 }
