@@ -1,4 +1,4 @@
-package by.may.infrastructure.event;
+package by.may.domain.event;
 
 import by.may.domain.Role;
 

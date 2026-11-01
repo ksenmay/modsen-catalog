@@ -1,6 +1,5 @@
 package by.may.application.service.query;
 
-import by.may.application.dto.ProductCreateRequest;
 import by.may.application.dto.ProductResponse;
 import by.may.application.service.ProductSearchCriteria;
 import org.springframework.data.domain.Page;

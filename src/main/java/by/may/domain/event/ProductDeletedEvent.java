@@ -1,4 +1,4 @@
-package by.may.infrastructure.event;
+package by.may.domain.event;
 
 public record ProductDeletedEvent(
         String productName) {}

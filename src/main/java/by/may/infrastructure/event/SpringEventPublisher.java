@@ -1,13 +1,13 @@
 package by.may.infrastructure.event;
 
-import by.may.application.port.DomainEventPublisher;
+import by.may.application.port.EventPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class EventPublisher implements DomainEventPublisher {
+public class SpringEventPublisher implements EventPublisher {
 
     private final ApplicationEventPublisher publisher;
 

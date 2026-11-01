@@ -1,20 +1,20 @@
 package by.may.application.service;
 
+import by.may.application.dto.ReviewCreateRequest;
+import by.may.application.dto.ReviewResponse;
+import by.may.application.mapper.ReviewMapper;
+import by.may.application.port.EventPublisher;
 import by.may.application.port.ProductRepositoryPort;
 import by.may.application.port.ReviewRepositoryPort;
 import by.may.application.port.UserRepositoryPort;
 import by.may.application.service.command.ReviewCommand;
 import by.may.application.service.query.ReviewQuery;
-import by.may.domain.exception.*;
-import by.may.application.dto.ReviewCreateRequest;
-import by.may.application.dto.ReviewResponse;
 import by.may.domain.Role;
-import by.may.application.mapper.ReviewMapper;
+import by.may.domain.event.ReviewAddedEvent;
+import by.may.domain.event.ReviewDeletedEvent;
+import by.may.domain.exception.*;
 import by.may.domain.model.Product;
 import by.may.domain.model.Review;
-import by.may.infrastructure.event.EventPublisher;
-import by.may.infrastructure.event.ReviewAddedEvent;
-import by.may.infrastructure.event.ReviewDeletedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,7 +34,11 @@ public class ReviewService implements ReviewCommand, ReviewQuery {
     private final EventPublisher publisher;
 
     @Transactional
-    public ReviewResponse createReview(Long productId, Long userId, ReviewCreateRequest dto) {
+    public ReviewResponse createReview(ReviewCreateRequest dto) {
+
+        Long userId = dto.userId();
+        Long productId = dto.productId();
+
         if (!userRepositoryPort.existsById(userId)) {
             log.error("пользователь {} не найден", userId);
             throw new UserNotFoundException(userId);
@@ -57,7 +61,10 @@ public class ReviewService implements ReviewCommand, ReviewQuery {
     }
 
     @Transactional
-    public ReviewResponse updateReview(Long reviewId, Long userId, ReviewCreateRequest dto) {
+    public ReviewResponse updateReview(Long reviewId, ReviewCreateRequest dto) {
+
+        Long userId = dto.userId();
+
         Review review = reviewRepositoryPort.findById(reviewId).orElseThrow(
                 () -> new ReviewNotFoundException(reviewId)
         );

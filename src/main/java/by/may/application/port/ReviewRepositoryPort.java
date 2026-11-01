@@ -1,11 +1,8 @@
 package by.may.application.port;
 
 import by.may.domain.model.Review;
-import by.may.infrastructure.entity.ReviewJpaEntity;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 

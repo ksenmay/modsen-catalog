@@ -1,7 +1,5 @@
 package by.may.infrastructure.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
 import lombok.AccessLevel;
