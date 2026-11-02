@@ -30,6 +30,11 @@ public class UserAdapter implements UserRepositoryPort {
     }
 
     @Override
+    public Optional<User> findByUsername(String username) {
+        return repository.findByUsername(username).map(jpaMapper::toModel);
+    }
+
+    @Override
     public boolean existsById(Long id) {
         return repository.existsById(id);
     }
@@ -89,5 +94,10 @@ public class UserAdapter implements UserRepositoryPort {
         Sort sort = Sort.by(direction, sortField.getSortField());
         PageRequest request = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
         return repository.findAll(request).map(jpaMapper::toModel);
+    }
+
+    @Override
+    public Optional<User> findByRefreshToken(String refreshToken) {
+        return repository.findByRefreshToken(refreshToken).map(jpaMapper::toModel);
     }
 }

@@ -1,34 +1,77 @@
 package by.may.application.service;
 
-import by.may.infrastructure.entity.UserJpaEntity;
-import by.may.infrastructure.event.EventPublisher;
-import by.may.infrastructure.event.UserLoggedInEvent;
+import by.may.application.dto.TokenPairResponse;
+import by.may.application.port.EventPublisher;
+import by.may.application.port.JwtPort;
+import by.may.application.port.PasswordHasher;
+import by.may.application.port.UserRepositoryPort;
+import by.may.domain.event.UserLoggedInEvent;
+import by.may.domain.exception.ForbiddenException;
 import by.may.domain.exception.UserNotFoundException;
-import by.may.infrastructure.repository.UserRepository;
+import by.may.domain.model.User;
+import by.may.infrastructure.security.CurrentUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private static final long REFRESH_TOKEN = 900;
+
+    private final UserRepositoryPort userRepositoryPort ;
+    private final PasswordHasher passwordHasher;
+    private final JwtPort jwt;
     private final EventPublisher publisher;
 
-    public UserJpaEntity authenticate(String username, String password) {
-        UserJpaEntity userJpaEntity = userRepository.findByUsername(username).orElseThrow(
+    @Transactional
+    public TokenPairResponse login(String username, String password) {
+        User user = userRepositoryPort.findByUsername(username).orElseThrow(
                 () -> new UserNotFoundException(username)
         );
 
-        if (!passwordEncoder.matches(password, userJpaEntity.getPasswordHash())) {
-            throw new UserNotFoundException("Неверный логин или пароль");
+        if (!passwordHasher.matches(password, user.getPasswordHash())) {
+            log.error("неверный логин {} или пароль", username);
+            throw new ForbiddenException("Invalid login or password");
         }
 
-        publisher.publish(new UserLoggedInEvent(userJpaEntity.getUsername()));
+        log.info("пользователь {} вошёл", username);
+        publisher.publish(new UserLoggedInEvent(username));
+        return issueToken(user);
+    }
 
-        return userJpaEntity;
+    @Transactional
+    public TokenPairResponse refresh(String refreshToken) {
+        User user = userRepositoryPort.findByRefreshToken(refreshToken).orElseThrow(
+                () -> new ForbiddenException("Invalid refresh token")
+        );
+        if (user.getRefreshTokenExpiryTime().isBefore(LocalDateTime.now())) {
+            throw new ForbiddenException("Refresh token has expired");
+        }
+        return issueToken(user);
+    }
+
+    private TokenPairResponse issueToken(User user) {
+        String access = jwt.createJwt(
+                new CurrentUser(
+                        user.getId(),
+                        user.getUsername(),
+                        user.getRole()
+                )
+        );
+        String refresh = UUID.randomUUID().toString();
+        user.setRefreshToken(refresh);
+        user.setRefreshTokenExpiryTime(LocalDateTime.now().plusSeconds(REFRESH_TOKEN));
+        userRepositoryPort.save(user);
+
+        return new TokenPairResponse(access, refresh);
     }
 
 }
