@@ -7,5 +7,3 @@ databaseChangeLog:
       file: db/changelog/changes/003-insert-test-data.sql
   - include:
       file: db/changelog/changes/004-update-user-entity.sql
-  - include:
-      file: db/changelog/changes/005-add-column-in-price-history.sql
