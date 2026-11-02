@@ -1,7 +1,9 @@
 package by.may.infrastructure.security;
 
+import by.may.application.port.JwtPort;
 import by.may.domain.Role;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,31 +11,32 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Optional;
 
 @Service
-public class JwtService {
+public class JwtService implements JwtPort {
 
     private final SecretKey key;
+    private final long expirationTime;
 
-    public JwtService(@Value("${app.jwt.secret}") String secret) {
+    public JwtService(@Value("${app.jwt.secret}") String secret, @Value("${app.jwt.expiration}") long expirationTime) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        this.expirationTime = expirationTime;
     }
 
     public String createJwt(CurrentUser currentUser) {
 
-        Instant now = Instant.now();
+        Date now = new Date();
 
         return Jwts.builder()
                 .subject(currentUser.username())
                 .claim("id", currentUser.id())
-                .claim("role", currentUser.role())
+                .claim("role", currentUser.role().name())
                 .issuer("auth-service")
-                .issuedAt(Date.from(now))
-                .expiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
-                .signWith(key)
+                .issuedAt(now)
+                .expiration(new Date(now.getTime() + expirationTime))
+                .signWith(this.key)
                 .compact();
     }
 
@@ -47,7 +50,16 @@ public class JwtService {
         return new CurrentUser(
                 claims.get("id", Long.class),
                 claims.getSubject(),
-                claims.get("role", Role.class)
+                Role.valueOf(claims.get("role", String.class))
         );
     }
+
+    public Optional<CurrentUser> validate(String token) {
+        try {
+            return Optional.of(parseJwt(token));
+        } catch (JwtException | IllegalArgumentException e) {
+            return Optional.empty();
+        }
+    }
+
 }

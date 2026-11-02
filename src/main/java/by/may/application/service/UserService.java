@@ -1,6 +1,7 @@
 package by.may.application.service;
 
 import by.may.application.dto.UserCreateRequest;
+import by.may.application.dto.UserRegisterRequest;
 import by.may.application.dto.UserResponse;
 import by.may.application.dto.UserUpdateRequest;
 import by.may.application.mapper.UserMapper;
@@ -35,20 +36,40 @@ public class UserService implements UserCommand, UserQuery {
 
     @Transactional
     public UserResponse createUser(UserCreateRequest dto) {
-        if (userRepositoryPort.existsByUsername(dto.username())) {
-            log.error("пользователь с {} уже существует", dto.username());
-            throw new UserAlreadyExistsException("username", dto.username());
-        }
+        String username = dto.username();
+        String email = dto.email();
 
-        if (userRepositoryPort.existsByEmail(dto.email())) {
-            log.error("пользователь с {} уже существует", dto.email());
-            throw new UserAlreadyExistsException("email", dto.email());
-        }
+        isUserExists(username, email);
 
         String hash = passwordHasher.hash(dto.password());
         User user = new User(dto.username(), dto.email(), hash, dto.role());
         log.info("создан пользователь {} с ролью {}", dto.username(), dto.role());
         return userMapper.toDto(userRepositoryPort.save(user));
+    }
+
+    @Transactional
+    public UserResponse registerUser(UserRegisterRequest dto) {
+        String username = dto.username();
+        String email = dto.email();
+
+        isUserExists(username, email);
+
+        String hash = passwordHasher.hash(dto.password());
+        User user = new User(dto.username(), dto.email(), hash, Role.CUSTOMER);
+        log.info("зарегестирован покупатель {}", dto.username());
+        return userMapper.toDto(userRepositoryPort.save(user));
+    }
+
+    private void isUserExists (String username, String email) {
+        if (userRepositoryPort.existsByUsername(username)) {
+            log.error("пользователь с {} уже существует", username);
+            throw new UserAlreadyExistsException("username", username);
+        }
+
+        if (userRepositoryPort.existsByEmail(email)) {
+            log.error("пользователь с {} уже существует", email);
+            throw new UserAlreadyExistsException("email", email);
+        }
     }
 
     @Transactional

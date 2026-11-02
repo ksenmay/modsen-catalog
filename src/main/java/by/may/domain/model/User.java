@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 public class User {
@@ -18,6 +19,10 @@ public class User {
     @Setter
     private Role role;
     private LocalDate createdAt;
+    @Setter
+    private String refreshToken;
+    @Setter
+    private LocalDateTime refreshTokenExpiryTime;
 
     public User(Long id, String username, String email, String passwordHash, Role role, LocalDate createdAt) {
         this.id = id;

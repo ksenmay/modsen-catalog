@@ -10,6 +10,7 @@ import java.util.Optional;
 
 public interface UserRepositoryPort {
     Optional<User> findById(Long id);
+    Optional<User> findByUsername(String username);
     boolean existsById(Long id);
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
