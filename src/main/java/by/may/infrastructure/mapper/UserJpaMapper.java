@@ -2,7 +2,9 @@ package by.may.infrastructure.mapper;
 
 import by.may.domain.model.User;
 import by.may.infrastructure.entity.UserJpaEntity;
+import org.springframework.stereotype.Component;
 
+@Component
 public class UserJpaMapper {
 
     public User toModel(UserJpaEntity entity) {

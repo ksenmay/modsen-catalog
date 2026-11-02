@@ -11,8 +11,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -48,28 +50,36 @@ public class ProductController {
         return productService.findById(id);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ProductResponse create(@Valid @RequestBody ProductCreateRequest dto) {
         return productService.createProduct(dto);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ProductResponse update(@PathVariable Long id, @Valid @RequestBody ProductCreateRequest dto) {
         return productService.updateProduct(id, dto);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         productService.deleteProduct(id);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/price-history")
     @ResponseStatus(HttpStatus.OK)
-    public Page<PriceHistoryResponse> getPriceHistory(@PathVariable Long id) {
-        return priceHistoryService.getHistory(id);
+    public Page<PriceHistoryResponse> getPriceHistory(@PathVariable Long id,
+                                                      @PageableDefault(
+                                                              size = 10,
+                                                              sort = "changedAt",
+                                                              direction = Sort.Direction.DESC)
+                                                      Pageable pageable) {
+        return priceHistoryService.getHistory(id, pageable);
     }
 
 }

@@ -6,6 +6,7 @@ import by.may.application.port.PriceHistoryRepositoryPort;
 import by.may.application.service.query.PriceHistoryQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,8 +17,8 @@ public class PriceHistoryService implements PriceHistoryQuery {
     private final PriceHistoryMapper priceHistoryMapper;
 
     @Transactional(readOnly = true)
-    public Page<PriceHistoryResponse> getHistory(Long productId) {
-        return priceHistoryRepositoryPort.findAllByProductId(productId).map(priceHistoryMapper::toDto);
+    public Page<PriceHistoryResponse> getHistory(Long productId, Pageable pageable) {
+        return priceHistoryRepositoryPort.findAllByProductId(productId, pageable).map(priceHistoryMapper::toDto);
     }
 
 }

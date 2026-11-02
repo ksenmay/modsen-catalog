@@ -3,7 +3,9 @@ package by.may.infrastructure.mapper;
 import by.may.domain.model.Product;
 import by.may.infrastructure.entity.CategoryJpaEntity;
 import by.may.infrastructure.entity.ProductJpaEntity;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ProductJpaMapper {
 
     public Product toModel(ProductJpaEntity entity) {
@@ -12,7 +14,7 @@ public class ProductJpaMapper {
                 entity.getName(),
                 entity.getDescription(),
                 entity.getPrice(),
-                entity.getCategoryJpaEntity().getId(),
+                entity.getCategory().getId(),
                 entity.getCreatedAt(),
                 entity.getAverageRating()
         );
@@ -31,7 +33,7 @@ public class ProductJpaMapper {
         entity.setName(model.getName());
         entity.setDescription(model.getDescription());
         entity.setPrice(model.getPrice());
-        entity.setCategoryJpaEntity(categoryJpa);
+        entity.setCategory(categoryJpa);
         return entity;
     }
 

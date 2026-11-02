@@ -1,6 +1,7 @@
 package by.may.web.controllers;
 
 import by.may.application.dto.UserCreateRequest;
+import by.may.application.dto.UserRegisterRequest;
 import by.may.application.dto.UserResponse;
 import by.may.application.dto.UserUpdateRequest;
 import by.may.application.service.UserService;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -32,39 +34,46 @@ public class UserController {
         return userService.findAll(userSortField, asc, pageable);
     }
 
-    @GetMapping
+    @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     public UserResponse getById(@PathVariable Long id) {
         return userService.getUserById(id);
     }
 
-    @PostMapping
+    @PostMapping("/admin")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public UserResponse create(@Valid @RequestBody UserCreateRequest dto) {
         return userService.createUser(dto);
     }
 
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserResponse register(@Valid @RequestBody UserRegisterRequest dto) {
+        return userService.registerUser(dto);
+    }
+
     @GetMapping("/me")
-    public UserResponse getCurrent(CurrentUser currentUser) { //todo потом поменять на нормальное без CurrentUser (через jwt)
+    public UserResponse getCurrent(@AuthenticationPrincipal CurrentUser currentUser) {
         return userService.getUserById(currentUser.id());
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     public UserResponse update (@PathVariable Long id, @Valid @RequestBody UserUpdateRequest dto) {
         return userService.updateUser(id, dto);
     }
 
-    @PatchMapping
+    @PatchMapping("/{id}/role")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     public UserResponse changeRole (@PathVariable Long id, @RequestParam Role role) {
         return userService.changeRole(id, role);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete (@PathVariable Long id, Long currentUserId) {

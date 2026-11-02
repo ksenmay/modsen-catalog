@@ -34,24 +34,23 @@ public class ReviewService implements ReviewCommand, ReviewQuery {
     private final EventPublisher publisher;
 
     @Transactional
-    public ReviewResponse createReview(ReviewCreateRequest dto) {
+    public ReviewResponse createReview(ReviewCreateRequest dto, Long currentUserId) {
 
-        Long userId = dto.userId();
         Long productId = dto.productId();
 
-        if (!userRepositoryPort.existsById(userId)) {
-            log.error("пользователь {} не найден", userId);
-            throw new UserNotFoundException(userId);
+        if (!userRepositoryPort.existsById(currentUserId)) {
+            log.error("пользователь {} не найден", currentUserId);
+            throw new UserNotFoundException(currentUserId);
         }
 
         Product product = productRepositoryPort.findById(productId).orElseThrow(
                 () -> new ProductNotFoundException(productId)
         );
 
-        if (reviewRepositoryPort.existsByUserIdAndProductId(userId, productId)) {
+        if (reviewRepositoryPort.existsByUserIdAndProductId(currentUserId, productId)) {
             log.error("пользователь {} уже писал отзыв на продукт {}",
-                    userId, productId);
-            throw new UserAlreadyAddReviewForProduct(userId, productId);
+                    currentUserId, productId);
+            throw new UserAlreadyAddReviewForProduct(currentUserId, productId);
         }
 
         product.setAverageRating(reviewRepositoryPort.calculateAverageRating(productId));
@@ -61,18 +60,16 @@ public class ReviewService implements ReviewCommand, ReviewQuery {
     }
 
     @Transactional
-    public ReviewResponse updateReview(Long reviewId, ReviewCreateRequest dto) {
-
-        Long userId = dto.userId();
+    public ReviewResponse updateReview(Long reviewId, Long currentUserId, ReviewCreateRequest dto) {
 
         Review review = reviewRepositoryPort.findById(reviewId).orElseThrow(
                 () -> new ReviewNotFoundException(reviewId)
         );
 
-        if (!review.getUserId().equals(userId)) {
+        if (!review.getUserId().equals(currentUserId)) {
             log.error("отзыв {} на продукт {} не написан пользователем {}",
-                    reviewId, review.getProductId(), userId);
-            throw new ReviewNotWrittenByUserException(userId, reviewId);
+                    reviewId, review.getProductId(), currentUserId);
+            throw new ReviewNotWrittenByUserException(currentUserId, reviewId);
         }
 
         review.setRating(dto.rating());
@@ -93,7 +90,7 @@ public class ReviewService implements ReviewCommand, ReviewQuery {
                 () -> new ReviewNotFoundException(reviewId)
         );
 
-        if (!review.getUserId().equals(currentUserId) || currentUserRole != Role.ADMIN) {
+        if (!review.getUserId().equals(currentUserId) && currentUserRole != Role.ADMIN) {
             log.error("отзыв {} на продукт {} не написан пользователем {} или администратором",
                     reviewId, review.getProductId(), currentUserId);
             throw new ReviewNotWrittenByUserException(reviewId, currentUserId);

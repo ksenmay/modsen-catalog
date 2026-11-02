@@ -40,7 +40,7 @@ public class ProductJpaEntity {
     @Setter
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
-    private CategoryJpaEntity categoryJpaEntity;
+    private CategoryJpaEntity category;
 
     @Column(nullable = false, updatable = false)
     private LocalDate createdAt;
@@ -51,11 +51,11 @@ public class ProductJpaEntity {
     @Setter
     private double averageRating = 0;
 
-    public ProductJpaEntity(String name, String description, BigDecimal price, CategoryJpaEntity categoryJpaEntity) {
+    public ProductJpaEntity(String name, String description, BigDecimal price, CategoryJpaEntity category) {
         this.name = name;
         this.description = description;
         this.price = price;
-        this.categoryJpaEntity = categoryJpaEntity;
+        this.category = category;
     }
 
     @PrePersist
