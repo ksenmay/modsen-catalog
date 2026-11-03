@@ -4,7 +4,9 @@ import by.may.domain.model.Review;
 import by.may.infrastructure.entity.ProductJpaEntity;
 import by.may.infrastructure.entity.ReviewJpaEntity;
 import by.may.infrastructure.entity.UserJpaEntity;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ReviewJpaMapper {
 
     public Review toModel(ReviewJpaEntity entity) {
@@ -12,8 +14,8 @@ public class ReviewJpaMapper {
                 entity.getId(),
                 entity.getRating(),
                 entity.getComment(),
-                entity.getUserJpaEntity().getId(),
-                entity.getProductJpaEntity().getId(),
+                entity.getUser().getId(),
+                entity.getProduct().getId(),
                 entity.getCreatedAt()
         );
     }

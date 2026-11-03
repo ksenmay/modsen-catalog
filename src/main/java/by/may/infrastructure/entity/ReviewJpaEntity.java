@@ -35,12 +35,12 @@ public class ReviewJpaEntity {
     @Setter
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name="user_id", nullable = false)
-    private UserJpaEntity userJpaEntity;
+    private UserJpaEntity user;
 
     @Setter
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name="product_id", nullable = false)
-    private ProductJpaEntity productJpaEntity;
+    private ProductJpaEntity product;
 
     @Column(nullable = false, updatable = false)
     private LocalDate createdAt;
@@ -49,11 +49,11 @@ public class ReviewJpaEntity {
     @Setter
     private boolean deleted = false;
 
-    public ReviewJpaEntity(int rating, String comment, UserJpaEntity userJpaEntity, ProductJpaEntity productJpaEntity) {
+    public ReviewJpaEntity(int rating, String comment, UserJpaEntity user, ProductJpaEntity product) {
         this.rating = rating;
         this.comment = comment;
-        this.userJpaEntity = userJpaEntity;
-        this.productJpaEntity = productJpaEntity;
+        this.user = user;
+        this.product = product;
     }
 
     public void markDelete() {

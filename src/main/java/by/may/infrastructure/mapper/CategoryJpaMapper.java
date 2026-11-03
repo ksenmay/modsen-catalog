@@ -2,7 +2,9 @@ package by.may.infrastructure.mapper;
 
 import by.may.domain.model.Category;
 import by.may.infrastructure.entity.CategoryJpaEntity;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CategoryJpaMapper {
     public Category toModel(CategoryJpaEntity entity) {
         return new Category(

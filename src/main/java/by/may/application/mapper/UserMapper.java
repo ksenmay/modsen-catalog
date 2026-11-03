@@ -1,7 +1,9 @@
 package by.may.application.mapper;
 
 import by.may.application.dto.UserCreateRequest;
+import by.may.application.dto.UserRegisterRequest;
 import by.may.application.dto.UserResponse;
+import by.may.domain.Role;
 import by.may.domain.model.User;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +16,14 @@ public class UserMapper {
                 dto.email(),
                 passwordHash,
                 dto.role()
+        );
+    }
+
+    public User toModel(UserRegisterRequest dto, String passwordHash) {
+        return new User(
+                dto.username(),
+                dto.email(), passwordHash,
+                Role.CUSTOMER
         );
     }
 

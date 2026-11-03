@@ -74,10 +74,9 @@ public class ProductService implements ProductCommand, ProductQuery {
                 () -> new ProductNotFoundException(id)
         );
         reviewRepositoryPort.softDeleteByProductId(id);
-        priceHistoryRepositoryPort.softDeleteByProductId(id);
         productRepositoryPort.delete(product.getId());
         publisher.publish(new ProductDeletedEvent(product.getName()));
-        log.info("удалён продукт {}, {}, отзывы на него и история цен", product.getId(), product.getName());
+        log.info("удалён продукт {}, {} и отзывы на него", product.getId(), product.getName());
     }
 
     @Transactional(readOnly = true)
