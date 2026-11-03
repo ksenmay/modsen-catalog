@@ -13,7 +13,10 @@ import by.may.domain.exception.CategoryAlreadyExistsException;
 import by.may.domain.exception.CategoryNotEmpty;
 import by.may.domain.exception.CategoryNotFoundException;
 import by.may.domain.model.Category;
+import by.may.infrastructure.cacheable.CacheConfig;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +35,11 @@ public class CategoryService implements CategoryCommand, CategoryQuery {
     private final ProductRepositoryPort productRepositoryPort;
     private final EventPublisher publisher;
 
+    @CacheEvict(cacheNames = {
+            CacheConfig.CATEGORIES_LIST,
+            CacheConfig.CATEGORY_BY_ID,
+            CacheConfig.CATEGORY_BY_NAME
+    }, allEntries = true)
     @Transactional
     public CategoryResponse createCategory(CategoryCreateRequest dto) {
         if (categoryRepositoryPort.existsByName(dto.name())) {
@@ -43,6 +51,11 @@ public class CategoryService implements CategoryCommand, CategoryQuery {
         return categoryMapper.toDto(categoryRepositoryPort.save(category));
     }
 
+    @CacheEvict(cacheNames = {
+            CacheConfig.CATEGORIES_LIST,
+            CacheConfig.CATEGORY_BY_ID,
+            CacheConfig.CATEGORY_BY_NAME
+    }, allEntries = true)
     @Transactional
     public CategoryResponse updateCategory(Long id, CategoryCreateRequest dto) {
         Category category = categoryRepositoryPort.findById(id).orElseThrow(
@@ -62,6 +75,11 @@ public class CategoryService implements CategoryCommand, CategoryQuery {
         return categoryMapper.toDto(categoryRepositoryPort.save(category));
     }
 
+    @CacheEvict(cacheNames = {
+            CacheConfig.CATEGORIES_LIST,
+            CacheConfig.CATEGORY_BY_ID,
+            CacheConfig.CATEGORY_BY_NAME
+    }, allEntries = true)
     @Transactional
     public void deleteCategory(Long id) {
         Category category = categoryRepositoryPort.findById(id).orElseThrow(
@@ -80,6 +98,7 @@ public class CategoryService implements CategoryCommand, CategoryQuery {
         }
     }
 
+    @Cacheable(cacheNames = CacheConfig.CATEGORY_BY_ID, key = "#id")
     @Transactional(readOnly = true)
     public CategoryResponse getCategoryByName(String name) {
         Category category = categoryRepositoryPort.findByName(name).orElseThrow(
@@ -88,6 +107,7 @@ public class CategoryService implements CategoryCommand, CategoryQuery {
         return categoryMapper.toDto(category);
     }
 
+    @Cacheable(cacheNames = CacheConfig.CATEGORY_BY_NAME, key = "#name")
     @Transactional(readOnly = true)
     public CategoryResponse getCategoryById(Long id) {
         Category category = categoryRepositoryPort.findById(id).orElseThrow(
@@ -96,6 +116,7 @@ public class CategoryService implements CategoryCommand, CategoryQuery {
         return categoryMapper.toDto(category);
     }
 
+    @Cacheable(cacheNames = CacheConfig.CATEGORIES_LIST, key = "#pageable")
     @Transactional(readOnly = true)
     public Page<CategoryResponse> getCategories(Pageable pageable) {
         Pageable sorted = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("name"));
