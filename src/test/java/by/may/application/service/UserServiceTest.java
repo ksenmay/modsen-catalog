@@ -37,7 +37,7 @@ class UserServiceTest {
     private UserService userService;
 
     @Test
-    void registerUserCreatesCustomerWithHashedPassword() {
+    void register_userCreatesCustomerWithHashedPassword() {
         UserRegisterRequest dto = new UserRegisterRequest("ivan", "ivan@mail.ru", "password1");
         when(userRepositoryPort.existsByUsername("ivan")).thenReturn(false);
         when(userRepositoryPort.existsByEmail("ivan@mail.ru")).thenReturn(false);
@@ -52,7 +52,7 @@ class UserServiceTest {
     }
 
     @Test
-    void createUserThrowsWhenUsernameTaken() {
+    void create_userThrowsWhenUsernameTaken() {
         UserCreateRequest dto = new UserCreateRequest("ivan", "ivan@mail.ru", "password1", Role.MANAGER);
         when(userRepositoryPort.existsByUsername("ivan")).thenReturn(true);
 
@@ -61,7 +61,7 @@ class UserServiceTest {
     }
 
     @Test
-    void changeRoleOfLastAdminIsForbidden() {
+    void changeRole_ofLastAdminIsForbidden() {
         User admin = new User(1L, "root", "root@mail.ru", "hash", Role.ADMIN, LocalDate.now());
         when(userRepositoryPort.findById(1L)).thenReturn(Optional.of(admin));
         when(userRepositoryPort.countByRole(Role.ADMIN)).thenReturn(1L);
@@ -70,7 +70,7 @@ class UserServiceTest {
     }
 
     @Test
-    void changeRolePublishesEventWithOldAndNewRole() {
+    void changeRole_publishesEventWithOldAndNewRole() {
         User user = new User(2L, "ivan", "ivan@mail.ru", "hash", Role.CUSTOMER, LocalDate.now());
         when(userRepositoryPort.findById(2L)).thenReturn(Optional.of(user));
 
@@ -80,14 +80,14 @@ class UserServiceTest {
     }
 
     @Test
-    void deleteUserForbidsDeletingYourself() {
+    void delete_userForbidsDeletingYourself() {
         assertThrows(UserCannotDeleteYourselfException.class,
                 () -> userService.deleteUser(1L, 1L));
         verify(userRepositoryPort, never()).delete(any());
     }
 
     @Test
-    void deleteUserOfLastAdminIsForbidden() {
+    void delete_userOfLastAdminIsForbidden() {
         User admin = new User(3L, "root", "root@mail.ru", "hash", Role.ADMIN, LocalDate.now());
         when(userRepositoryPort.findById(3L)).thenReturn(Optional.of(admin));
         when(userRepositoryPort.countByRole(Role.ADMIN)).thenReturn(1L);

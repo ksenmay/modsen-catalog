@@ -32,7 +32,7 @@ class CategoryServiceTest {
     @InjectMocks private CategoryService categoryService;
 
     @Test
-    void createThrowsWhenNameAlreadyExists() {
+    void create_throwsWhenNameAlreadyExists() {
         CategoryCreateRequest dto = new CategoryCreateRequest("Техника", "desc");
         when(categoryRepositoryPort.existsByName("Техника")).thenReturn(true);
 
@@ -41,7 +41,7 @@ class CategoryServiceTest {
     }
 
     @Test
-    void createSavesCategoryWhenNameIsFree() {
+    void create_savesCategoryWhenNameIsFree() {
         CategoryCreateRequest dto = new CategoryCreateRequest("Книги", "desc");
         Category category = new Category(null, "Книги", "desc");
         when(categoryRepositoryPort.existsByName("Книги")).thenReturn(false);
@@ -54,7 +54,7 @@ class CategoryServiceTest {
     }
 
     @Test
-    void updateThrowsWhenNewNameBelongsToAnotherCategory() {
+    void update_throwsWhenNewNameBelongsToAnotherCategory() {
         Category category = new Category(1L, "Техника", "desc");
         CategoryCreateRequest dto = new CategoryCreateRequest("Книги", "desc");
         when(categoryRepositoryPort.findById(1L)).thenReturn(Optional.of(category));
@@ -65,7 +65,7 @@ class CategoryServiceTest {
     }
 
     @Test
-    void deleteThrowsWhenCategoryHasProducts() {
+    void delete_throwsWhenCategoryHasProducts() {
         Category category = new Category(1L, "Техника", "desc");
         when(categoryRepositoryPort.findById(1L)).thenReturn(Optional.of(category));
         when(productRepositoryPort.existsAnyByCategoryId(1L)).thenReturn(true);
@@ -76,7 +76,7 @@ class CategoryServiceTest {
     }
 
     @Test
-    void deleteRemovesEmptyCategoryAndPublishesEvent() {
+    void delete_removesEmptyCategoryAndPublishesEvent() {
         Category category = new Category(1L, "Техника", "desc");
         when(categoryRepositoryPort.findById(1L)).thenReturn(Optional.of(category));
         when(productRepositoryPort.existsAnyByCategoryId(1L)).thenReturn(false);
