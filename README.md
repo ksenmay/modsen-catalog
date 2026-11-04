@@ -12,6 +12,8 @@
 - PostgreSQL
 - Liquibase
 - Lombok
+- JUnit 5, Mockito
+- Docker
 
 ## Настройка окружения
 
@@ -37,7 +39,17 @@ git clone <адрес-репозитория>
 cd modsen-catalog
 ```
 
-### 2. Поднять PostgreSQL
+### 2. Образ приложения собирается в два этапа, описанных в `Dockerfile`
+**build** — образ с JDK и Maven
+**runtime** — образ с JRE
+
+build:
+
+```
+docker compose build 
+```
+
+### 3. PostgreSQL
 
 ```
 docker compose up -d
