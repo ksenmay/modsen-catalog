@@ -36,7 +36,16 @@ public class ReviewAdapter implements ReviewRepositoryPort {
         UserJpaEntity userJpaEntity = userRepository.findById(review.getUserId()).orElseThrow(
                 () -> new UserNotFoundException(review.getUserId())
         );
-        return jpaMapper.toModel(repository.save(jpaMapper.toNewEntity(review, productJpaEntity, userJpaEntity)));
+        ReviewJpaEntity entity;
+        if (review.getId() == null) {
+            entity = jpaMapper.toNewEntity(review, productJpaEntity, userJpaEntity);
+        } else {
+            ReviewJpaEntity existing = repository.findById(review.getId()).orElseThrow(
+                    () -> new ReviewNotFoundException(productJpaEntity.getId())
+            );
+            entity = jpaMapper.updateEntity(review, existing);
+        }
+        return jpaMapper.toModel(repository.save(entity));
     }
 
     @Override

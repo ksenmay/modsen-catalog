@@ -1,4 +1,4 @@
-package by.may.infrastructure.cacheable;
+package by.may.infrastructure.config;
 
 import jakarta.persistence.Cacheable;
 import org.springframework.cache.CacheManager;

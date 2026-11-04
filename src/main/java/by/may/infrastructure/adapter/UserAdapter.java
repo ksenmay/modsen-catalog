@@ -1,22 +1,22 @@
 package by.may.infrastructure.adapter;
 
 import by.may.application.port.UserRepositoryPort;
-import by.may.application.service.UserSortField;
-import by.may.domain.Role;
-import by.may.domain.exception.UserNotFoundException;
-import by.may.domain.model.User;
-import by.may.infrastructure.entity.UserJpaEntity;
-import by.may.infrastructure.mapper.UserJpaMapper;
-import by.may.infrastructure.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Component;
+    import by.may.application.service.UserSortField;
+    import by.may.domain.Role;
+    import by.may.domain.exception.UserNotFoundException;
+    import by.may.domain.model.User;
+    import by.may.infrastructure.entity.UserJpaEntity;
+    import by.may.infrastructure.mapper.UserJpaMapper;
+    import by.may.infrastructure.repository.UserRepository;
+    import lombok.RequiredArgsConstructor;
+    import org.springframework.data.domain.Page;
+    import org.springframework.data.domain.PageRequest;
+    import org.springframework.data.domain.Pageable;
+    import org.springframework.data.domain.Sort;
+    import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
+    import java.util.Optional;
+    
 @Component
 @RequiredArgsConstructor
 public class UserAdapter implements UserRepositoryPort {
@@ -51,13 +51,22 @@ public class UserAdapter implements UserRepositoryPort {
 
     @Override
     public User save(User user) {
-        return jpaMapper.toModel(repository.save(jpaMapper.toNewEntity(user)));
+        UserJpaEntity entity;
+        if (user.getId() == null) {
+        entity = jpaMapper.toNewEntity(user);
+        } else {
+        UserJpaEntity existing = repository.findById(user.getId()).orElseThrow(
+            () -> new UserNotFoundException(user.getId())
+        );
+        entity = jpaMapper.updateEntity(user, existing);
+        }
+        return jpaMapper.toModel(repository.save(entity));
     }
 
     @Override
     public void delete(Long id) {
         UserJpaEntity entity = repository.findById(id).orElseThrow(
-                () -> new UserNotFoundException(id)
+            () -> new UserNotFoundException(id)
         );
         repository.delete(entity);
     }
@@ -86,9 +95,9 @@ public class UserAdapter implements UserRepositoryPort {
     public Page<User> findAll(UserSortField sortField, boolean asc, Pageable pageable) {
         Sort.Direction direction;
         if (asc) {
-            direction = Sort.Direction.ASC;
+        direction = Sort.Direction.ASC;
         } else {
-            direction = Sort.Direction.DESC;
+        direction = Sort.Direction.DESC;
         }
 
         Sort sort = Sort.by(direction, sortField.getSortField());

@@ -1,17 +1,17 @@
 package by.may.infrastructure.entity;
 
 import by.may.domain.Role;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
+    import jakarta.persistence.*;
+    import jakarta.validation.constraints.Email;
+    import lombok.AccessLevel;
+    import lombok.Getter;
+    import lombok.NoArgsConstructor;
+    import lombok.Setter;
+    import org.hibernate.annotations.SQLDelete;
+    import org.hibernate.annotations.SQLRestriction;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+    import java.time.LocalDate;
+    import java.time.LocalDateTime;
 
 @Getter
 @Entity
@@ -50,9 +50,11 @@ public class UserJpaEntity {
     private boolean deleted = false;
 
     @Column(name="refresh_token", length=255)
+    @Setter
     private String refreshToken;
 
     @Column(name = "refresh_token_expiry_time")
+    @Setter
     private LocalDateTime refreshTokenExpiryTime;
 
     public UserJpaEntity(String username, String email, String passwordHash, Role role) {
@@ -66,4 +68,4 @@ public class UserJpaEntity {
     private void onCreate() {
         this.createdAt = LocalDate.now();
     }
-}
+    }

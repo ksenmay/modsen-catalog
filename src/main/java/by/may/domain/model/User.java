@@ -33,6 +33,17 @@ public class User {
         this.createdAt = createdAt;
     }
 
+    public User(Long id, String username, String email, String passwordHash, Role role, LocalDate createdAt, String refreshToken, LocalDateTime refreshTokenExpiryTime) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.role = role;
+        this.createdAt = createdAt;
+        this.refreshToken = refreshToken;
+        this.refreshTokenExpiryTime = refreshTokenExpiryTime;
+    }
+
     public User(String username, String email, String passwordHash, Role role) {
         this.username = username;
         this.email = email;

@@ -112,7 +112,7 @@ public class UserService implements UserCommand, UserQuery {
         user.setRole(newRole);
         publisher.publish(new UserRoleChangedEvent(user.getUsername(), oldRole, newRole));
         log.info("роль пользователя {} {} изменеа с {} на {}", user.getUsername(), user.getId(), oldRole, newRole);
-        return userMapper.toDto(user);
+        return userMapper.toDto(userRepositoryPort.save(user));
     }
 
     @Transactional

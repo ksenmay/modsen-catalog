@@ -74,4 +74,14 @@ public class AuthService {
         return new TokenPairResponse(access, refresh);
     }
 
+    @Transactional
+    public void logout(Long userId) {
+        User user = userRepositoryPort.findById(userId).orElseThrow(
+                () -> new UserNotFoundException(userId)
+        );
+        user.setRefreshToken(null);
+        user.setRefreshTokenExpiryTime(null);
+        userRepositoryPort.save(user);
+        log.info("пользователь {} вышел", user.getUsername());
+    }
 }

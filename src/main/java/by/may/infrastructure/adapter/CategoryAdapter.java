@@ -37,7 +37,16 @@ public class CategoryAdapter implements CategoryRepositoryPort {
 
     @Override
     public Category save(Category category) {
-        return jpaMapper.toModel(repository.save(jpaMapper.toNewEntity(category)));
+        CategoryJpaEntity entity;
+        if (category.getId() == null) {
+            entity = jpaMapper.toNewEntity(category);
+        } else {
+            CategoryJpaEntity existing = repository.findById(category.getId()).orElseThrow(
+                    () -> new CategoryNotFoundException(category.getId())
+            );
+            entity = jpaMapper.updateEntity(existing, category);
+        }
+        return jpaMapper.toModel(repository.save(entity));
     }
 
     @Override
