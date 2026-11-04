@@ -14,7 +14,9 @@ public class UserJpaMapper {
                 entity.getEmail(),
                 entity.getPasswordHash(),
                 entity.getRole(),
-                entity.getCreatedAt()
+                entity.getCreatedAt(),
+                entity.getRefreshToken(),
+                entity.getRefreshTokenExpiryTime()
         );
     }
 
@@ -32,7 +34,8 @@ public class UserJpaMapper {
         entity.setEmail(model.getEmail());
         entity.setRole(model.getRole());
         entity.setPasswordHash(model.getPasswordHash());
-
+        entity.setRefreshToken(model.getRefreshToken());
+        entity.setRefreshTokenExpiryTime(model.getRefreshTokenExpiryTime());
         return entity;
     }
 

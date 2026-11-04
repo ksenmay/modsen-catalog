@@ -49,7 +49,16 @@ public class ProductAdapter implements ProductRepositoryPort {
         CategoryJpaEntity categoryJpa = categoryRepository.findById(product.getCategoryId()).orElseThrow(
                 () -> new CategoryNotFoundException(product.getCategoryId())
         );
-        return jpaMapper.toModel(repository.save(jpaMapper.toNewEntity(product, categoryJpa)));
+        ProductJpaEntity entity;
+        if (product.getId() == null) {
+            entity = jpaMapper.toNewEntity(product, categoryJpa);
+        } else {
+            ProductJpaEntity existing = repository.findById(product.getId()).orElseThrow(
+                    () -> new ProductNotFoundException(product.getId())
+            );
+            entity = jpaMapper.updateEntity(product, existing);
+        }
+        return jpaMapper.toModel(repository.save(entity));
     }
 
     @Override
