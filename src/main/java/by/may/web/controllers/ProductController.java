@@ -7,6 +7,9 @@ import by.may.application.service.PriceHistoryService;
 import by.may.application.service.ProductSearchCriteria;
 import by.may.application.service.ProductService;
 import by.may.application.service.ProductSortField;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,15 +22,19 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 
+@Tag(name="Продукты", description="Каталог продуктов с поиском, фильтрацией сортировкой")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/products/")
+@RequestMapping("/api/products")
 public class ProductController {
 
     private final ProductService productService;
     private final PriceHistoryService priceHistoryService;
 
+    @Operation(summary = "Поиск продуктов",
+            description = "Фильтрация, сортировка, поиск по названию")
     @GetMapping
+    @SecurityRequirements
     @ResponseStatus(HttpStatus.OK)
     public Page<ProductResponse> search(
             @RequestParam(required = false) String name,
@@ -44,12 +51,17 @@ public class ProductController {
         return productService.searchProducts(criteria, pageable);
     }
 
+    @Operation(summary = "Продукт по id",
+            description = "Доступно всем")
+    @SecurityRequirements
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ProductResponse getById(@PathVariable Long id) {
         return productService.findById(id);
     }
 
+    @Operation(summary = "Создать продукт",
+            description = "Доступно ADMIN и MANAGER")
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -57,6 +69,8 @@ public class ProductController {
         return productService.createProduct(dto);
     }
 
+    @Operation(summary = "Изменить продукт",
+            description = "Доступно ADMIN и MANAGER")
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -64,6 +78,8 @@ public class ProductController {
         return productService.updateProduct(id, dto);
     }
 
+    @Operation(summary = "Удалить продукт",
+            description = "Доступно ADMIN и MANAGER")
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -71,6 +87,9 @@ public class ProductController {
         productService.deleteProduct(id);
     }
 
+    @Operation(summary = "История цен продукта",
+            description = "Доступно всем")
+    @SecurityRequirements
     @GetMapping("/{id}/price-history")
     @ResponseStatus(HttpStatus.OK)
     public Page<PriceHistoryResponse> getPriceHistory(@PathVariable Long id,
