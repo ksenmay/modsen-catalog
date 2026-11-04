@@ -37,7 +37,7 @@ class ReviewServiceTest {
     @InjectMocks private ReviewService reviewService;
 
     @Test
-    void createThrowsWhenProductNotFound() {
+    void create_throwsWhenProductNotFound() {
         ReviewCreateRequest dto = new ReviewCreateRequest(5, "Отлично", 1L, 77L);
         when(userRepositoryPort.existsById(1L)).thenReturn(true);
         when(productRepositoryPort.findById(77L)).thenReturn(Optional.empty());
@@ -46,7 +46,7 @@ class ReviewServiceTest {
     }
 
     @Test
-    void createThrowsWhenUserAlreadyReviewedProduct() {
+    void create_throwsWhenUserAlreadyReviewedProduct() {
         ReviewCreateRequest dto = new ReviewCreateRequest(5, "Отлично", 1L, 10L);
         when(userRepositoryPort.existsById(1L)).thenReturn(true);
         when(productRepositoryPort.findById(10L))
@@ -60,7 +60,7 @@ class ReviewServiceTest {
     }
 
     @Test
-    void createThrowsWhenUserNotFound() {
+    void create_throwsWhenUserNotFound() {
         ReviewCreateRequest dto = new ReviewCreateRequest(5, "Отлично", 10L, 1L);
         when(userRepositoryPort.existsById(99L)).thenReturn(false);
 
@@ -68,7 +68,7 @@ class ReviewServiceTest {
     }
 
     @Test
-    void updateThrowsWhenReviewBelongsToAnotherUser() {
+    void update_throwsWhenReviewBelongsToAnotherUser() {
         Review review = new Review(5L, 4, "Чужой", 4L, 10L, LocalDate.now());
         when(reviewRepositoryPort.findById(5L)).thenReturn(Optional.of(review));
         ReviewCreateRequest dto = new ReviewCreateRequest(1, "хочу правку", 10L, 1L);
@@ -79,7 +79,7 @@ class ReviewServiceTest {
     }
 
     @Test
-    void deleteThrowsForNonAdminDeletingOtherUsersReview() {
+    void delete_throwsForNonAdminDeletingOtherUsersReview() {
         Review review = new Review(5L, 4, "Чужлй", 4L, 1L, LocalDate.now());
         when(reviewRepositoryPort.findById(5L)).thenReturn(Optional.of(review));
 

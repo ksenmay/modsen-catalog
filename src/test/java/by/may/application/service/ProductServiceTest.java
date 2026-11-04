@@ -37,7 +37,7 @@ class ProductServiceTest {
     @InjectMocks private ProductService productService;
 
     @Test
-    void updateWithChangedPriceSavesHistoryAndPublishesEvent() {
+    void update_withChangedPriceSavesHistoryAndPublishesEvent() {
         Product product = new Product(1L, "Ноутбук", "desc", new BigDecimal("100.00"), 1L, LocalDate.now(), 0.0);        ProductCreateRequest dto = new ProductCreateRequest("Ноутбук", "desc", new BigDecimal("120.00"), 1L);
         when(productRepositoryPort.findById(1L)).thenReturn(Optional.of(product));
 
@@ -48,7 +48,7 @@ class ProductServiceTest {
     }
 
     @Test
-    void updateWithSamePriceDoesNotWriteHistory() {
+    void update_withSamePriceDoesNotWriteHistory() {
         Product product = new Product(1L, "Ноутбук", "desc", new BigDecimal("100.00"), 1L, LocalDate.now(), 0.0);        ProductCreateRequest dto = new ProductCreateRequest("Ноутбук", "desc", new BigDecimal("100"), 1L);
         when(productRepositoryPort.findById(1L)).thenReturn(Optional.of(product));
 
@@ -59,7 +59,7 @@ class ProductServiceTest {
     }
 
     @Test
-    void updateThrowsWhenProductNotFound() {
+    void update_throwsWhenProductNotFound() {
         when(productRepositoryPort.findById(9L)).thenReturn(Optional.empty());
 
         assertThrows(ProductNotFoundException.class,
@@ -67,7 +67,7 @@ class ProductServiceTest {
     }
 
     @Test
-    void deleteSoftDeletesReviewsBeforeProduct() {
+    void delete_softDeletesReviewsBeforeProduct() {
         Product product = new Product(1L, "Ноутбук", "desc", new BigDecimal("100.00"), 1L, LocalDate.now(), 0.0);        when(productRepositoryPort.findById(1L)).thenReturn(Optional.of(product));
 
         productService.deleteProduct(1L);
@@ -79,7 +79,7 @@ class ProductServiceTest {
     }
 
     @Test
-    void findByIdThrowsWhenMissing() {
+    void findById_throwsWhenMissing() {
         when(productRepositoryPort.findById(5L)).thenReturn(Optional.empty());
 
         assertThrows(ProductNotFoundException.class, () -> productService.findById(5L));

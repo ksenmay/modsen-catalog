@@ -28,7 +28,7 @@ class PriceHistoryServiceTest {
     @InjectMocks private PriceHistoryService priceHistoryService;
 
     @Test
-    void getHistoryReturnsMappedPageFromRepository() {
+    void getHistory_returnsMappedPageFromRepository() {
         PriceHistory history = mock(PriceHistory.class);
         PriceHistoryResponse response = mock(PriceHistoryResponse.class);
         var pageable = PageRequest.of(0, 10);
@@ -45,7 +45,7 @@ class PriceHistoryServiceTest {
     }
 
     @Test
-    void getHistoryReturnsEmptyPageWhenNoRecords() {
+    void getHistory_returnsEmptyPageWhenNoRecords() {
         var pageable = PageRequest.of(0, 10);
         Page<PriceHistory> emptyPage = new PageImpl<>(List.of(), pageable, 0);
 

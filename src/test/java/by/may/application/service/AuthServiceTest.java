@@ -32,7 +32,7 @@ class AuthServiceTest {
     private AuthService authService;
 
     @Test
-    void loginReturnsTokenPairForValidCredentials() {
+    void login_returnsTokenPairForValidCredentials() {
         User user = new User(1L, "ivan", "ivan@mail.ru", "hash", Role.CUSTOMER, LocalDate.now());
         when(userRepositoryPort.findByUsername("ivan")).thenReturn(Optional.of(user));
         when(passwordHasher.matches("pass", "hash")).thenReturn(true);
@@ -46,7 +46,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void loginThrowsForWrongPassword() {
+    void login_throwsForWrongPassword() {
         User user = new User(1L, "ivan", "ivan@mail.ru", "hash", Role.CUSTOMER, LocalDate.now());
         when(userRepositoryPort.findByUsername("ivan")).thenReturn(Optional.of(user));
         when(passwordHasher.matches("wrong", "hash")).thenReturn(false);
@@ -56,7 +56,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void refreshReturnsNewPairAndRotatesToken() {
+    void refresh_returnsNewPairAndRotatesToken() {
         User user = new User(1L, "ivan", "ivan@mail.ru", "hash", Role.CUSTOMER, LocalDate.now());
         user.setRefreshToken("old");
         user.setRefreshTokenExpiryTime(LocalDateTime.now().plusDays(1));
@@ -70,7 +70,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void refreshThrowsForExpiredToken() {
+    void refresh_throwsForExpiredToken() {
         User user = new User(1L, "ivan", "ivan@mail.ru", "hash", Role.CUSTOMER, LocalDate.now());
         user.setRefreshToken("old");
         user.setRefreshTokenExpiryTime(LocalDateTime.now().minusMinutes(1));
@@ -80,7 +80,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void refreshThrowsForUnknownToken() {
+    void refresh_throwsForUnknownToken() {
         when(userRepositoryPort.findByRefreshToken("bad")).thenReturn(Optional.empty());
 
         assertThrows(ForbiddenException.class, () -> authService.refresh("bad"));
