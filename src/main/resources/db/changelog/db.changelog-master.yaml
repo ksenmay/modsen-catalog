@@ -5,3 +5,5 @@ databaseChangeLog:
       file: db/changelog/changes/002-first-admin.sql
   - include:
       file: db/changelog/changes/003-insert-test-data.sql
+  - include:
+      file: db/changelog/changes/004-update-user-entity.sql

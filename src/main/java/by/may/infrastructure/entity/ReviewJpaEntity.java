@@ -1,0 +1,67 @@
+package by.may.infrastructure.entity;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
+
+import java.time.LocalDate;
+
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
+@SQLRestriction("is_deleted = false")
+@Entity
+@Table(name = "reviews", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "product_id"}))
+public class ReviewJpaEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Setter
+    @Column(nullable = false)
+    @Min(value = 1)
+    @Max(value = 5)
+    private int rating;
+
+    @Setter
+    @Column(nullable = false)
+    private String comment;
+
+    @Setter
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id", nullable = false)
+    private UserJpaEntity user;
+
+    @Setter
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name="product_id", nullable = false)
+    private ProductJpaEntity product;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDate createdAt;
+
+    @Column(name = "is_deleted", nullable = false)
+    @Setter
+    private boolean deleted = false;
+
+    public ReviewJpaEntity(int rating, String comment, UserJpaEntity user, ProductJpaEntity product) {
+        this.rating = rating;
+        this.comment = comment;
+        this.user = user;
+        this.product = product;
+    }
+
+    public void markDelete() {
+        this.deleted = true;
+    }
+
+    @PrePersist
+    private void onCreate() {
+        this.createdAt = LocalDate.now();
+    }
+}
